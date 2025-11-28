@@ -2701,7 +2701,8 @@ function updateAnalysisOuCylAx() {
   }
 
   // Build output
-  let html = `<b><u>Astigmatism Changes Effect:</u></b><br>`;
+  let html = `
+<b><u>Astigmatism Changes Effect:</u></b><br>`;
 
   // "No change" == no stretch AND axis at prime
   const stretchText = getCylStretchEffect(cyl);
@@ -2805,7 +2806,7 @@ function describeDC(dc, label = 'Current') {
     if (parsed.kind === 'BAL') return `${label} Well balance between distance and near vision.`;
     if (parsed.kind === 'CODE') {
         const absD = Math.abs(parsed.diopter).toFixed(2);
-        const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : 'green'}; font-weight:normal;">${parsed.raw}</span>`;
+        const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : '#0C6DC2'}; font-weight:bold;">${parsed.raw}</span>`;
         if (parsed.type === 'R') {
             return `${label} Under by -${absD} (${colourLabel}). Good for seeing near.`;
         } else {
@@ -2830,7 +2831,7 @@ if (f.type === 'G' && t.type === 'G') {
     } else if (t.step < f.step) {
         parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To resolve the over-correction in stages.');
     } else if (t.step > f.step) {
-        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: green;">G1</span>).');
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: #0C6DC2;">G1</span>).');
     } else {
         parts.push('- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.');
     }
@@ -2852,7 +2853,7 @@ if (distanceImprovementCond) {
             );
         } else {
             parts.push(
-                `- <b>Distance Vision Changes</b>: Distance clarity will improve. See as far as possible but over-correction.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: green;">G1</span>).`
+                `- <b>Distance Vision Changes</b>: Distance clarity will improve. See as far as possible but over-correction.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: #0C6DC2;">G1</span>).`
             );
         }
     } else {
@@ -2952,7 +2953,7 @@ function getDCShiftText(fromDC, toDC) {
         const mag = Math.abs(newD).toFixed(2);
         let codeLabel = '';
         if (t.kind === 'CODE') {
-            codeLabel = `(<span style="color:${t.type==='R'?'red':'green'}; font-weight:normal;">${t.type}${t.step}</span>)`;
+            codeLabel = `(<span style="color:${t.type==='R'?'red':'#0C6DC2'}; font-weight:normal;">${t.type}${t.step}</span>)`;
         }
 
         if (newD < 0) {
@@ -2981,7 +2982,7 @@ function getDCShiftText(fromDC, toDC) {
     line1,
     line3,
     '<b>---------------------</b>',
-    '<b>Changes</u></b>:',
+    '<b><u>Changes</U></b>:',
     line4
   ].filter(Boolean).join('<br>');
 
@@ -3033,9 +3034,7 @@ function updateOUAnalysis() {
     const oldDC = document.getElementById('dc-ou')?.textContent.trim() || '';
     const newDC = document.getElementById('res-dc-ou-re')?.textContent.trim() || '';
     const diff = (parseDC(newDC)?.diopter || 0) - (parseDC(oldDC)?.diopter || 0);
-    const output = `
-<b><u>Vision Status</u></b><br>
-${getDCShiftText(oldDC,newDC)}<br>
+    const output = `<b><u>Vision Status</U></b><br>${getDCShiftText(oldDC,newDC)}<br>
 `;
     document.getElementById('analysis-ou').innerHTML = output;
 }
@@ -3242,6 +3241,22 @@ wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
     "a2-ou": document.getElementById("a2_ou")?.value || "",
     "c2_ou": document.getElementById("c2_ou")?.value || "",
 
+finalR: {
+  sph:  document.getElementById("final-sph-ou-re")?.textContent.trim() || "",
+  cyl:  document.getElementById("final-cyl-ou-re")?.textContent.trim() || "",
+  axis: document.getElementById("final-axis-ou-re")?.textContent.trim() || "",
+  se:   document.getElementById("final-se-ou-re")?.textContent.trim() || "",
+  dc:   document.getElementById("final-dc-ou-re")?.textContent.trim() || "",
+},
+finalL: {
+  sph:  document.getElementById("final-sph-ou-le")?.textContent.trim() || "",
+  cyl:  document.getElementById("final-cyl-ou-le")?.textContent.trim() || "",
+  axis: document.getElementById("final-axis-ou-le")?.textContent.trim() || "",
+  se:   document.getElementById("final-se-ou-le")?.textContent.trim() || "",
+  dc:   document.getElementById("final-dc-ou-le")?.textContent.trim() || "",
+},
+
+
 
     /* COMFY CLEARER FINAL */
     comfyR: {
@@ -3258,7 +3273,11 @@ wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
     },
     comfySeDiff: document.getElementById("res-se-diff-ou-re")?.textContent || "",
     comfyNotes: document.getElementById("extra-notes-comfy")?.value || "",
-    comfyAnalysis: document.getElementById("analysis-ou")?.innerHTML || "",
+comfyAnalysis:       document.getElementById("analysis-ou")?.innerHTML || "",
+comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
+comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
+
+
 
     /* EXTRA NOTES */
     extraNotes: document.getElementById("extra-notes-comfy")?.value || ""
