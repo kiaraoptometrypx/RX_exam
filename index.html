@@ -505,7 +505,10 @@ function setFontSize(size, btn) {
     <div class="pane" style="padding:0 0 10px 0;">
 
 
+<span id="toggle-manual1" style="margin-left:5%; cursor:pointer; user-select:none;">▼ Manual</span>
 
+
+<div id="exam-manual1" style="display:none">
 <div id="exam-manual">
 
 <table>
@@ -696,7 +699,7 @@ function setFontSize(size, btn) {
 
 </table>
 </div>
-
+</div>
 
 
 <div id="exam-comfy">
@@ -780,7 +783,7 @@ function setFontSize(size, btn) {
 
 
 
-<tr class="now noprint">
+<tr class="now noprint" style="display:none">
   <td rowspan="2">FC DC<br>Balance</td>
 <td>R</td>
   <td id="final-sph-ou-re">0.00</td>
@@ -790,7 +793,7 @@ function setFontSize(size, btn) {
   <td id="bypass-final-ou">—</td>
   <td id="final-dc-ou-re">—</td>
 </tr>
-<tr class="now noprint">
+<tr class="now noprint" style="display:none">
  <td>L</td>
 
   <td id="final-sph-ou-le">0.00</td>
@@ -2702,7 +2705,7 @@ function updateAnalysisOuCylAx() {
 
   // Build output
   let html = `
-<b><u>Astigmatism Changes Effect:</u></b><br>`;
+<b><u>Astigmatism Changes Effect:</u></b>`;
 
   // "No change" == no stretch AND axis at prime
   const stretchText = getCylStretchEffect(cyl);
@@ -2725,9 +2728,7 @@ function updateAnalysisOuCylAx() {
   }
 
   html += `
-    - <b>Stretched Effect</b>: ${stretchText || "None"}<br>
-    - <b>Tilt Effect</b>: ${tiltText || "None"}<br>
-    - <b>Adaptation Capability</b>: ${adaptText}
+    - <b>Stretched Effect</b>: ${stretchText || "None"}<br>    - <b>Tilt Effect</b>: ${tiltText || "None"}<br>    - <b>Adaptation Capability</b>: ${adaptText}
   `;
 
   document.getElementById("analysis-ou-cylax").innerHTML = html;
@@ -2806,7 +2807,7 @@ function describeDC(dc, label = 'Current') {
     if (parsed.kind === 'BAL') return `${label} Well balance between distance and near vision.`;
     if (parsed.kind === 'CODE') {
         const absD = Math.abs(parsed.diopter).toFixed(2);
-        const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : '#0C6DC2'}; font-weight:bold;">${parsed.raw}</span>`;
+        const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : '#0C6DC2'};">${parsed.raw}</span>`;
         if (parsed.type === 'R') {
             return `${label} Under by -${absD} (${colourLabel}). Good for seeing near.`;
         } else {
@@ -2979,8 +2980,8 @@ function getDCShiftText(fromDC, toDC) {
 
   // Write separately
   document.getElementById("analysis-ou").innerHTML = [
-    line1,
-    line3,
+line1,
+'- <b>Recommended:</b> Distance Preferred RX.',
     '<b>---------------------</b>',
     '<b><u>Changes</U></b>:',
     line4
@@ -2993,8 +2994,8 @@ function getDCShiftText(fromDC, toDC) {
 
   // Only return the "Changes" part (no Expectations here anymore)
   return [
-    line1,
-    line3,
+line1,
+'- <b>Recommended:</b> Distance Preferred RX.',
     '<br><b><u>Changes</u></b>:',
     line4
   ].filter(Boolean).join('<br>');
@@ -3028,6 +3029,8 @@ ${getDCShiftText(oldDCL,newDCL)}<br><br>
 `;
     document.getElementById('analysis-od-os').innerHTML = output;
 }
+
+
 
 // --- OU Analysis ---
 function updateOUAnalysis() {
@@ -3188,7 +3191,7 @@ function makeToggle(buttonId, sectionId) {
   });
 }
 
-
+makeToggle("toggle-manual1", "exam-manual1");
 makeToggle("toggle-manual", "exam-manual");
 makeToggle("toggle-comfy", "exam-comfy");
 makeToggle("toggle-sharpest", "exam-sharpest");
@@ -3235,6 +3238,9 @@ wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
 
     /* ADD */
     add_ou: document.getElementById("add-ou")?.value || "",
+    addOutput: document.getElementById("addOutput")?.textContent || "–",
+    addOutput2: document.getElementById("addOutput2")?.textContent || "–",
+
 
     /* EXAMINATION (ADJUSTED FC + DC) */
     "dc-sph-ou": document.getElementById("dc-sph-ou")?.value || "",
@@ -3273,9 +3279,9 @@ finalL: {
     },
     comfySeDiff: document.getElementById("res-se-diff-ou-re")?.textContent || "",
     comfyNotes: document.getElementById("extra-notes-comfy")?.value || "",
-comfyAnalysis:       document.getElementById("analysis-ou")?.innerHTML || "",
-comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
-comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
+    comfyAnalysis:       document.getElementById("analysis-ou")?.innerHTML || "",
+    comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
+    comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
 
 
 
@@ -3284,11 +3290,41 @@ comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || 
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
+  window.open("report.html", "_blank");
+
 }
 </script>
 
 
+<script>
+(function(){
+  let sMinusApplied = false;
+
+  function applySMinus025() {
+    if (sMinusApplied) return; // prevent repeated clicks
+    const sMinus025 = document.querySelector(".sph-btn[data-step='-0.25']");
+    if (sMinus025 && !sMinus025.classList.contains('active')) {
+      sMinusApplied = true;
+      sMinus025.click();
+      // optional: reset flag after a short delay in case needed for future recalcs
+      setTimeout(() => { sMinusApplied = false; }, 200);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", applySMinus025);
+
+  if (typeof window.updateDC === "function") {
+    const originalUpdateDC = window.updateDC;
+    window.updateDC = function(...args){
+      originalUpdateDC(...args);
+      applySMinus025();
+    };
+  } else {
+    const observer = new MutationObserver(applySMinus025);
+    observer.observe(document.getElementById('dc-advice'), { childList:true, subtree:true });
+  }
+})();
+</script>
 
 
 
