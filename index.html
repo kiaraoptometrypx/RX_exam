@@ -3288,7 +3288,35 @@ calculate();
 
 
 
+<script>
+(function(){
+  let sMinusApplied = false;
 
+  function applySMinus025() {
+    if (sMinusApplied) return; // prevent repeated clicks
+    const sMinus025 = document.querySelector(".sph-btn[data-step='-0.25']");
+    if (sMinus025 && !sMinus025.classList.contains('active')) {
+      sMinusApplied = true;
+      sMinus025.click();
+      // optional: reset flag after a short delay in case needed for future recalcs
+      setTimeout(() => { sMinusApplied = false; }, 200);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", applySMinus025);
+
+  if (typeof window.updateDC === "function") {
+    const originalUpdateDC = window.updateDC;
+    window.updateDC = function(...args){
+      originalUpdateDC(...args);
+      applySMinus025();
+    };
+  } else {
+    const observer = new MutationObserver(applySMinus025);
+    observer.observe(document.getElementById('dc-advice'), { childList:true, subtree:true });
+  }
+})();
+</script>
 
 
 
@@ -3392,41 +3420,12 @@ finalL: {
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("report.html", "_blank");
+  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
 
 }
 </script>
 
 
-<script>
-(function(){
-  let sMinusApplied = false;
-
-  function applySMinus025() {
-    if (sMinusApplied) return; // prevent repeated clicks
-    const sMinus025 = document.querySelector(".sph-btn[data-step='-0.25']");
-    if (sMinus025 && !sMinus025.classList.contains('active')) {
-      sMinusApplied = true;
-      sMinus025.click();
-      // optional: reset flag after a short delay in case needed for future recalcs
-      setTimeout(() => { sMinusApplied = false; }, 200);
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", applySMinus025);
-
-  if (typeof window.updateDC === "function") {
-    const originalUpdateDC = window.updateDC;
-    window.updateDC = function(...args){
-      originalUpdateDC(...args);
-      applySMinus025();
-    };
-  } else {
-    const observer = new MutationObserver(applySMinus025);
-    observer.observe(document.getElementById('dc-advice'), { childList:true, subtree:true });
-  }
-})();
-</script>
 
 
 
