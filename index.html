@@ -465,22 +465,21 @@ function setFontSize(size, btn) {
 
 <tr class="white">
     <td><b>Current Add</b></td>
-    <td colspan="3"><b>Phone Length (cm) & Estimated Add</b></td>
-    <td colspan="3"><b>Screen Length (cm) & Estimated Add</b></td>
+    <td colspan="3"><b>Screen Length (cm) & Estimated Inter Add</b></td>
+    <td colspan="3"><b>Phone Length (cm) & Estimated Near Add</b></td>
 </tr>
 <tr>
 
     <td><input id="add-ou" placeholder="+0.00"></td>
-
-    <td colspan="3" style="text-align:left;">
-    <label for="targetDistInput" style="display:none;">Book</label>
-    <input type="number" id="targetDistInput" min="0" placeholder="33" style="max-width:35px; margin: 0px 0px 0px 10px">
-    &nbsp;&nbsp;&nbsp;<span id="addOutput">–</span>
-    </td>
     <td colspan="3" style="text-align:left;">
     <label for="targetDistInput2" style="display:none;">Screen:</label>
     <input type="number" id="targetDistInput2" min="0" placeholder="50" style="max-width:35px; margin: 0px 0px 0px 10px">
-    &nbsp;&nbsp;&nbsp;<span id="addOutput2">–</span>
+    &nbsp;&nbsp;&nbsp;<span id="addOutput2">Key In Age First</span>
+    </td>
+    <td colspan="3" style="text-align:left;">
+    <label for="targetDistInput" style="display:none;">Book</label>
+    <input type="number" id="targetDistInput" min="0" placeholder="33" style="max-width:35px; margin: 0px 0px 0px 10px">
+    &nbsp;&nbsp;&nbsp;<span id="addOutput">Key In Age First</span>
     </td>
 </tr>
 
@@ -778,8 +777,25 @@ function setFontSize(size, btn) {
     <td id="dc-ou">—</td>
   </tr>
 
+<tr class="now">
+    <td><b>Intermediate<br>DC Error<b></td>
+<td>BE</td>
+    <td><input id="inter-dc-sph-ou" placeholder="+0.00"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
 
-
+<tr class="now">
+    <td><b>Near<br>DC Error<b></td>
+<td>BE</td>
+    <td><input id="near-dc-sph-ou" placeholder="+0.00"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
 
 
 
@@ -812,6 +828,15 @@ function setFontSize(size, btn) {
 
 <tbody class="toggle-section-comfort-rx" style="display:none;">
 
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
 
 <tr class="comfort">
 <td><b>Final RX</b></td>
@@ -854,6 +879,28 @@ function setFontSize(size, btn) {
     <td >—</td>
     <td id="res-dc-ou-le">BAL</td>
   </tr>
+
+<tr class="comfort">
+    <td>Inter Add</td>
+<td>BE</td>
+    <td><div id="result-inter">+0.00</div></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+<tr class="comfort">
+    <td>Near Add</td>
+<td>BE</td>
+    <td><div id="result-near">+0.00</div></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+
 <tr class="adjustments noprint">
 <td colspan="7">
 <span onclick="toggleRow('adjustments-row-1')" 
@@ -1538,6 +1585,7 @@ function attachNoteHandlers() {
     "dc-sph-ou-notes", "c2_ou_notes", "a2_ou_notes",
     "dc-sph-od-notes", "c2_od_notes", "a2_od_notes",
     "dc-sph-os-notes", "c2_os_notes", "a2_os_notes",
+    
 
 
     // --- OU (manual) ---
@@ -2263,7 +2311,9 @@ prescribedDCEyes.forEach(id => {
     "s1_os","c1_os","a1_os",
     "dc-sph-od","c2_od","a2_od",
     "dc-sph-os","c2_os","a2_os",
-    "dc-sph-ou","c2_ou","a2_ou"
+    "dc-sph-ou","c2_ou","a2_ou",
+    "near-dc-sph-ou","inter-dc-sph-ou"
+
   ];
 
   inputIds.forEach(id => {
@@ -2713,7 +2763,7 @@ function updateAnalysisOuCylAx() {
   const noChange = (!stretchText && dPrime === 0);
 
   if (noChange) {
-    html += "- No changes in prescription.";
+    html += "<br>- No changes in prescription.";
     document.getElementById("analysis-ou-cylax").innerHTML = html;
     return;
   }
@@ -2825,18 +2875,25 @@ function getDeeperAnalysis(fromDC, toDC, prevParsed, toParsed) {
     const parts = [];
     if (f.kind === 'BAL' && t.kind === 'BAL') return '- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.';
     if (f.type === 'R' && t.type === 'R' && f.step === t.step) return '- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.';
-    // Rule 1: G → G
+
+// Rule 1: G → G
 if (f.type === 'G' && t.type === 'G') {
-    if (t.step === 1) {
-        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To prescribe proper distance preferred prescription.');
-    } else if (t.step < f.step) {
-        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To resolve the over-correction in stages.');
+
+    // Explicitly handle G1 → G1
+    if (f.step === 1 && t.step === 1) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes:</b> No changes.<br>- <b>No changes happening.</b> ');
+    }
+    else if (t.step < f.step) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes:</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To resolve the over-correction in stages.');
     } else if (t.step > f.step) {
         parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: #0C6DC2;">G1</span>).');
+    } else if (t.step === 1) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To prescribe proper distance preferred prescription.');
     } else {
         parts.push('- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.');
     }
 }
+
 
 
 // Rule 4: Distance improvement
@@ -3197,13 +3254,58 @@ makeToggle("toggle-comfy", "exam-comfy");
 makeToggle("toggle-sharpest", "exam-sharpest");
 
 
-
-
-
-
-
-
 </script>
+
+
+
+<script>
+function formatDiopter(v) {
+    if (v < 0) v = 0;
+    return "+" + v.toFixed(2);
+}
+
+function calculate() {
+    const base = parseFloat(document.getElementById('add-ou').value) || 0;
+    const nearRaw = parseFloat(document.getElementById('near-dc-sph-ou').value) || 0;
+    const interRaw = parseFloat(document.getElementById('inter-dc-sph-ou').value) || 0;
+
+    const nearFinal = base + nearRaw - 0.25;
+    const interFinal = base + interRaw - 0.25;
+
+    document.getElementById('result-near').textContent = formatDiopter(nearFinal);
+    document.getElementById('result-inter').textContent = formatDiopter(interFinal);
+}
+
+['add-ou','near-dc-sph-ou','inter-dc-sph-ou'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculate);
+});
+
+calculate();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <button onclick="goToReport()" 
