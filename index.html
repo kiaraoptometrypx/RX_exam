@@ -414,7 +414,7 @@ function setFontSize(size, btn) {
     <td><b>Cyl</b></td>
     <td><b>Axis</b></td>
     <td><b>SE Diff</b></td>
-    <td><b>Near</b></td>
+    <td><b>Add</b></td>
 </tr>
 
 
@@ -442,10 +442,7 @@ function setFontSize(size, btn) {
     <td><input id="a1_od" placeholder="0"></td>
     <td id="now-se-diff-od">—</td>
 <td rowspan="2">
-<span class="toggle-btn" data-target="toggle-section-near-rx"
-          style="cursor:pointer; color: #101F01; user-select:none; text-align:middle;">
-    Details<br> ▼▲
-    </span>
+<input id="add-ou" placeholder="+0.00">
 </div></td>
   </tr>
 
@@ -470,7 +467,7 @@ function setFontSize(size, btn) {
 </tr>
 <tr>
 
-    <td><input id="add-ou" placeholder="+0.00"></td>
+    <td>-</td>
     <td colspan="3" style="text-align:left;">
     <label for="targetDistInput2" style="display:none;">Screen:</label>
     <input type="number" id="targetDistInput2" min="0" placeholder="50" style="max-width:35px; margin: 0px 0px 0px 10px">
@@ -3266,17 +3263,18 @@ function formatDiopter(v) {
 
 function calculate() {
     const base = parseFloat(document.getElementById('add-ou').value) || 0;
+    const farchanges = parseFloat(document.getElementById('dc-sph-ou').value) || 0;
     const nearRaw = parseFloat(document.getElementById('near-dc-sph-ou').value) || 0;
     const interRaw = parseFloat(document.getElementById('inter-dc-sph-ou').value) || 0;
 
-    const nearFinal = base + nearRaw - 0.25;
-    const interFinal = base + interRaw - 0.25;
+    const nearFinal = base + nearRaw - farchanges + 0.250;
+    const interFinal = base + interRaw - farchanges + 0.250;
 
     document.getElementById('result-near').textContent = formatDiopter(nearFinal);
     document.getElementById('result-inter').textContent = formatDiopter(interFinal);
 }
 
-['add-ou','near-dc-sph-ou','inter-dc-sph-ou'].forEach(id => {
+['add-ou','near-dc-sph-ou','inter-dc-sph-ou','dc-sph-ou'].forEach(id => {
     document.getElementById(id).addEventListener('input', calculate);
 });
 
@@ -3370,6 +3368,8 @@ wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
     add_ou: document.getElementById("add-ou")?.value || "",
     addOutput: document.getElementById("addOutput")?.textContent || "–",
     addOutput2: document.getElementById("addOutput2")?.textContent || "–",
+resultNear: document.getElementById("result-near")?.textContent || "–",
+resultInter: document.getElementById("result-inter")?.textContent || "–",
 
 
     /* EXAMINATION (ADJUSTED FC + DC) */
@@ -3420,7 +3420,7 @@ finalL: {
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
+  window.open("report.html", "_blank");
 
 }
 </script>
