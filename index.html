@@ -2851,15 +2851,15 @@ function describeDC(dc, label = 'Current') {
     if (!dc) return '';
     const parsed = parseDC(dc);
     if (!parsed) return `${label} RX: ${dc}`;
-    if (parsed.kind === 'BAL') return `${label} Well balance between distance and near vision.`;
+    if (parsed.kind === 'BAL') return `${label} Generally ok but far can be clearer`;
     if (parsed.kind === 'CODE') {
         const absD = Math.abs(parsed.diopter).toFixed(2);
         const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : '#0C6DC2'};">${parsed.raw}</span>`;
         if (parsed.type === 'R') {
-            return `${label} Under by -${absD} (${colourLabel}). Good for seeing near.`;
+            return `${label} Generally under by -${absD} (${colourLabel} = Good for seeing near but not far)`;
         } else {
-            if (parsed.step === 1) return `${label} Over by +${absD} (${colourLabel}). Good for seeing far.`;
-            return `${label} Over by +${absD} (${colourLabel}); Good for seeing far but over-corrected prescription.`;
+            if (parsed.step === 1) return `${label} Generally over by +${absD} (${colourLabel} = Good for seeing far)`;
+            return `${label} Generally over by +${absD} (${colourLabel} = Good for seeing far but too strong)`;
         }
     }
      return `${label} ${dc}`;
@@ -2930,6 +2930,25 @@ let lossDist = t.kind === 'BAL' ? 20 : Math.round(((1 / (t.step * 0.25)) * 3.281
 }
 
 
+function describeAstig() {
+    const cylRaw = document.getElementById("c2_ou")?.value.trim();
+    const axis = document.getElementById("a2_ou")?.value.trim();
+
+    // if nothing is entered at all
+    if (!cylRaw || !axis) {
+        return `. Balanced in all angles.`;
+    }
+
+    const cyl = parseFloat(cylRaw);
+
+    // zero / no astigmatism
+    if (isNaN(cyl) || cyl === 0) {
+        return `. Balanced in all angles.`;
+    }
+
+    // astigmatism present
+    return `but slightly strong at ${axis}° angle.`;
+}
 
 
 
@@ -2942,7 +2961,10 @@ function getDCShiftText(fromDC, toDC) {
     const stepDiff = (t.stepVal || t.diopter/0.25) - (f.stepVal || f.diopter/0.25);
     const diopterShift = stepDiff * 0.25;
 
-    const line1 = describeDC(fromDC, '- <b>Current RX:</b>');
+const line1 = 
+    describeDC(fromDC, '- <b>Current RX:</b>') + 
+    ' ' + 
+    describeAstig();
     let line2 = '';
 
    if (Math.abs(diopterShift) < 0.0001) {
@@ -2959,6 +2981,9 @@ function getDCShiftText(fromDC, toDC) {
         line2 += 'moderate swim effect.';
     else 
         line2 += 'obvious swim effect.';
+
+
+
 
     // --- Second line: Tolerance Analysis ---
     try {
@@ -3012,7 +3037,7 @@ function getDCShiftText(fromDC, toDC) {
         }
 
         if (newD < 0) {
-            line3 = `- <b>New RX</b>: Under by -${mag} ${codeLabel}. Good for seeing near.`;
+            line3 = `- <b>New RX</b>: Under by -${mag} ${codeLabel}. Good for seeing near. Not seeing the furthest possible yet.`;
         } else if (newD === 0) {
             line3 = `- <b>New RX</b>: At -${mag} ${codeLabel}.`;
         } else {
@@ -3036,8 +3061,7 @@ function getDCShiftText(fromDC, toDC) {
   document.getElementById("analysis-ou").innerHTML = [
 line1,
 '- <b>Recommended:</b> Distance Preferred RX.',
-    '<b>---------------------</b>',
-    '<b><u>Changes</U></b>:',
+    '<br><b><u>Overall Changes Anticipated</U></b>:',
     line4
   ].filter(Boolean).join('<br>');
 
@@ -3050,7 +3074,7 @@ line1,
   return [
 line1,
 '- <b>Recommended:</b> Distance Preferred RX.',
-    '<br><b><u>Changes</u></b>:',
+    '<br><b><u>Overall Changes Anticipated</U></b>:',
     line4
   ].filter(Boolean).join('<br>');
 }
@@ -3319,25 +3343,16 @@ calculate();
 
 
 
+<div style="display:flex; justify-content:center; margin-top:10px;">
+  <button onclick="goToReport()" 
+          style="padding:10px 20px; background:#DBB47B; color: black; border:1px solid black; border-radius:6px; cursor:pointer;">
+    <b>Go To Report</b>
+  </button>
+</div>
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-<button onclick="goToReport()" 
-  style="padding:10px 20px; margin-top:30px; background:#0b3d2e; color:#ffffe0; border:none; border-radius:6px; cursor:pointer;">
-  Go To Report
-</button>
 
 
 
@@ -3420,7 +3435,7 @@ finalL: {
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("report.html", "_blank");
+  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
 
 }
 </script>
