@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Rotatable Angular Blur</title>
+<title>Angular Radial Blur - Rotatable Mask</title>
 <style>
 body {margin:20px;font-family:system-ui;}
 canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
@@ -26,86 +26,74 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
 <script>
 const RAW="https://raw.githubusercontent.com/kiaraoptometrypx/RX_exam/main/fan_chart.png";
-const canvas=document.getElementById("c");
-const ctx=canvas.getContext("2d");
+const canvas=document.getElementById("c"), ctx=canvas.getContext("2d");
 const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;
 
+let rotationDeg=0, maxBlur=4;
+
+// Base image
 const img=new Image();
-img.crossOrigin="anonymous";
-img.src=RAW;
+img.crossOrigin="anonymous"; img.src=RAW;
 
-let levels=12;        // more levels = smoother blur
-let maxBlur=4;
-let gamma=0.75;
-let rotationDeg=0;
-let layers=[];
+// Create mask canvas
+const maskCanvas=document.createElement("canvas");
+maskCanvas.width=w; maskCanvas.height=h;
+const maskCtx=maskCanvas.getContext("2d");
 
-img.onload=()=>{generateLayers(); drawBlur();};
-
-// generate multiple blurred layers
-function generateLayers(){
-  layers=[];
-  for(let i=0;i<levels;i++){
-    const off=document.createElement("canvas");
-    off.width=w; off.height=h;
-    const octx=off.getContext("2d");
-    const blurPx=(i/(levels-1))*maxBlur; // linear steps
-    octx.filter=`blur(${blurPx}px)`;
-    octx.drawImage(img,0,0,w,h);
-    layers.push(octx.getImageData(0,0,w,h));
-  }
-}
-
-// angular factor 0..1 per pixel
-function angularFactor(x,y){
-  const dx=x-cx, dy=y-cy;
-  let theta=Math.atan2(dy,dx)-rotationDeg*Math.PI/180;
-  let v=(Math.cos(2*theta)+1)/2;
-  return Math.pow(v,gamma);
-}
-
-// blend layers per pixel
-function drawBlur(){
-  const result=ctx.createImageData(w,h);
-  const out=result.data;
-
+function createMask(){
+  const imgData=maskCtx.createImageData(w,h);
+  const data=imgData.data;
   for(let y=0;y<h;y++){
     for(let x=0;x<w;x++){
       const idx=(y*w+x)*4;
-      const f=angularFactor(x,y);
-      const floatIndex=f*(levels-1);
-      const i0=Math.floor(floatIndex), i1=Math.min(levels-1,i0+1);
-      const t=floatIndex-i0;
+      const dx=x-cx, dy=y-cy;
+      let theta=Math.atan2(dy,dx);
+      let v=(Math.cos(2*theta)+1)/2;  // angular distribution
+      v=Math.pow(v,0.75); // gamma for smoothness
 
-      const d0=layers[i0].data, d1=layers[i1].data;
-      out[idx]   = Math.round(d0[idx]*(1-t)+d1[idx]*t);
-      out[idx+1] = Math.round(d0[idx+1]*(1-t)+d1[idx+1]*t);
-      out[idx+2] = Math.round(d0[idx+2]*(1-t)+d1[idx+2]*t);
-      out[idx+3] = d0[idx+3];
+      data[idx]=255;       // keep pixel white
+      data[idx+1]=255;
+      data[idx+2]=255;
+      data[idx+3]=Math.round(v*255); // alpha = blur intensity
     }
   }
-
-  ctx.putImageData(result,0,0);
+  maskCtx.putImageData(imgData,0,0);
 }
 
-// slider handling
-function setupSlider(id, callback){
-  const s=document.getElementById(id);
-  s.addEventListener("input",callback);
-  s.addEventListener("change",callback);
+function draw(){
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(img,0,0,w,h);
+
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(rotationDeg*Math.PI/180);
+  ctx.translate(-cx,-cy);
+
+  ctx.filter=`blur(${maxBlur}px)`;
+  ctx.globalCompositeOperation="destination-in"; // apply mask as alpha
+  ctx.drawImage(maskCanvas,0,0);
+  ctx.restore();
+
+  ctx.globalCompositeOperation="source-over";
+  ctx.filter="none";
 }
 
-setupSlider("rotation", e=>{
+img.onload=()=>{
+  createMask();
+  draw();
+}
+
+// Sliders
+document.getElementById("rotation").addEventListener("input", e=>{
   rotationDeg=+e.target.value;
   document.getElementById("rotVal").textContent=rotationDeg;
-  drawBlur();
+  draw();
 });
 
-setupSlider("maxBlur", e=>{
+document.getElementById("maxBlur").addEventListener("input", e=>{
   maxBlur=+e.target.value;
   document.getElementById("blurVal").textContent=maxBlur;
-  generateLayers();
-  drawBlur();
+  draw();
 });
 </script>
 </body>
