@@ -2,95 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Safari-Compatible Rotatable Radial Blur</title>
+<title>Angular Radial Blur - Mask Method</title>
 <style>
-body {margin:20px; font-family:system-ui;}
-canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
+body {margin:20px;font-family:system-ui;}
+canvas {border:1px solid #ccc;display:block;margin-bottom:20px;}
 label {margin-left:10px;}
-input[type=range] {
-  -webkit-appearance: none;
-  width: 900px; height: 8px; background: #ddd; border-radius: 4px;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px; height: 18px; background: #333; border-radius: 50%; cursor: pointer;
-}
+input[type=range]{-webkit-appearance:none;width:900px;height:8px;background:#ddd;border-radius:4px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#333;border-radius:50%;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<canvas id="c" width="700" height="700"></canvas>
+<canvas id="c" width="500" height="500"></canvas>
 
 <div>
-  <input type="range" id="rotation" min="0" max="180" value="0" step="0.5">
-  <label>Rotation: <span id="rotVal">0</span>°</label>
+<input type="range" id="rotation" min="0" max="360" value="0" step="0.5">
+<label>Rotation: <span id="rotVal">0</span>°</label>
 </div>
 <div>
-  <input type="range" id="maxBlur" min="0" max="8" value="4" step="0.1">
-  <label>Max Blur: <span id="blurVal">4</span>px</label>
+<input type="range" id="maxBlur" min="0" max="12" value="4" step="0.1">
+<label>Max Blur: <span id="blurVal">4</span>px</label>
 </div>
 
 <script>
-const RAW = "https://raw.githubusercontent.com/kiaraoptometrypx/RX_exam/main/fan_chart.png";
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2;
+const RAW="https://raw.githubusercontent.com/kiaraoptometrypx/RX_exam/main/fan_chart.png";
+const canvas=document.getElementById("c"), ctx=canvas.getContext("2d");
+const w=canvas.width, h=canvas.height, cx=w/2, cy=h/2;
 
-const img = new Image();
-img.crossOrigin = "anonymous";
-img.src = RAW;
+let rotationDeg=0, maxBlur=4;
 
-let levels = 8;       // number of blur steps
-let maxBlur = 4;
-let gamma = 0.75;     // controls smoothness
-let rotationDeg = 0;
+// Load base image
+const img=new Image();
+img.crossOrigin="anonymous"; img.src=RAW;
 
-img.onload = () => drawBlur();
+// Create angular blur mask
+const maskCanvas=document.createElement("canvas");
+maskCanvas.width=w; maskCanvas.height=h;
+const maskCtx=maskCanvas.getContext("2d");
 
-// Compute angular factor for pixel (0..1)
-function angularFactor(x,y){
-  const dx = x-cx;
-  const dy = y-cy;
-  let theta = Math.atan2(dy, dx) - rotationDeg * Math.PI/180;
-  let v = (Math.cos(2*theta)+1)/2;
-  return Math.pow(v, gamma);
+function createMask(){
+  const imgData=maskCtx.createImageData(w,h);
+  const data=imgData.data;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const idx=(y*w+x)*4;
+      const dx=x-cx, dy=y-cy;
+      let theta=Math.atan2(dy,dx);
+      let v=(Math.cos(2*theta)+1)/2; // strongest blur at 3/9 o'clock
+      v=Math.pow(v,0.75); // gamma for smoothness
+      let alpha=Math.round(v*255);
+      data[idx]=data[idx+1]=data[idx+2]=0;
+      data[idx+3]=alpha;
+    }
+  }
+  maskCtx.putImageData(imgData,0,0);
 }
 
-// Draw image with angular blur
-function drawBlur(){
+function draw(){
   ctx.clearRect(0,0,w,h);
 
-  // Draw multiple blurred copies with alpha blending
-  for(let i=0;i<levels;i++){
-    const blurPx = (i/(levels-1))*maxBlur;
-    ctx.filter = `blur(${blurPx}px)`;
-    ctx.globalAlpha = 1.0 / levels; // simple even blend
-    ctx.drawImage(img,0,0,w,h);
-  }
+  // Draw base image
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(rotationDeg*Math.PI/180);
+  ctx.translate(-cx,-cy);
+  ctx.drawImage(img,0,0,w,h);
+  ctx.restore();
 
-  ctx.filter = 'none';
-  ctx.globalAlpha = 1.0;
+  // Apply blur overlay using mask
+  ctx.save();
+  ctx.filter=`blur(${maxBlur}px)`;
+  ctx.globalCompositeOperation="source-over";
+  ctx.drawImage(maskCanvas,0,0);
+  ctx.restore();
+}
+
+img.onload=()=>{
+  createMask();
+  draw();
 }
 
 // Rotation slider
-function setupSlider(id, callback){
-  const s = document.getElementById(id);
-  s.addEventListener("input", callback);
-  s.addEventListener("change", callback);
-}
-
-setupSlider("rotation", e=>{
-  rotationDeg = +e.target.value;
-  document.getElementById("rotVal").textContent = rotationDeg;
-  drawBlur();
+document.getElementById("rotation").addEventListener("input", e=>{
+  rotationDeg=+e.target.value;
+  document.getElementById("rotVal").textContent=rotationDeg;
+  draw();
 });
 
-setupSlider("maxBlur", e=>{
-  maxBlur = +e.target.value;
-  document.getElementById("blurVal").textContent = maxBlur;
-  drawBlur();
+// Max blur slider
+document.getElementById("maxBlur").addEventListener("input", e=>{
+  maxBlur=+e.target.value;
+  document.getElementById("blurVal").textContent=maxBlur;
+  draw();
 });
 </script>
-
 </body>
 </html>
