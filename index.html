@@ -5,22 +5,35 @@
 <title>Rotatable Radial Angular Blur</title>
 <style>
   body {margin:20px; font-family:system-ui;}
-  canvas {border:1px solid #ccc;}
-  label {margin-right:10px;}
+  canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
+  label {margin-left:10px;}
+  input[type=range] {
+    -webkit-appearance: none;  /* needed for iOS Safari */
+    width: 900px; 
+    height: 8px; 
+    background: #ddd; 
+    border-radius: 4px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    background: #333; border-radius: 50%;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
 <canvas id="c" width="700" height="700"></canvas>
-<div>
-  <input type="range" id="rotation" min="0" max="180" value="0" step="5" style="width:500px;">  <label>Rotation: <span id="rotVal">0</span>°</label>
 
+<div>
+  <input type="range" id="rotation" min="0" max="180" value="0" step="0.5">
+  <label>Rotation: <span id="rotVal">0</span>°</label>
 </div>
 <div>
-  <input type="range" id="maxBlur" min="0" max="8" value="4" step="0.5" style="width:500px;">  <label>Max Blur: <span id="blurVal">4</span>px</label>
-
+  <input type="range" id="maxBlur" min="0" max="8" value="4" step="0.1">
+  <label>Max Blur: <span id="blurVal">4</span>px</label>
 </div>
-
 
 <script>
 const RAW = "https://raw.githubusercontent.com/kiaraoptometrypx/RX_exam/main/fan_chart.png";
@@ -33,7 +46,7 @@ img.crossOrigin = "anonymous";
 img.src = RAW;
 
 let levels = 4;
-let maxBlur = 2;
+let maxBlur = 4;
 let gamma = 0.75; // smoother, more even blur
 let rotationDeg = 0;
 let layers = [];
@@ -92,14 +105,20 @@ function drawBlur(){
   ctx.putImageData(result,0,0);
 }
 
-// slider events
-document.getElementById("rotation").addEventListener("input", e=>{
+// unified slider handler for iPad Safari
+function setupSlider(id, callback){
+  const slider = document.getElementById(id);
+  slider.addEventListener("input", callback);
+  slider.addEventListener("change", callback); // ensures iOS catches it
+}
+
+setupSlider("rotation", e=>{
   rotationDeg = +e.target.value;
   document.getElementById("rotVal").textContent = rotationDeg;
   drawBlur();
 });
 
-document.getElementById("maxBlur").addEventListener("input", e=>{
+setupSlider("maxBlur", e=>{
   maxBlur = +e.target.value;
   document.getElementById("blurVal").textContent = maxBlur;
   generateLayers();
