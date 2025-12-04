@@ -2,103 +2,3487 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Angular Radial Blur - Rotatable Mask</title>
+<meta name="viewport" content="width=device-width, initial-scale=0.5">
+<title>Kiara Optometry Algorithm Refraction</title>
 <style>
-body {margin:20px;font-family:system-ui;}
-canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
-label {margin-left:10px;}
-input[type=range]{-webkit-appearance:none;width:500px;height:8px;background:#ddd;border-radius:4px;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#333;border-radius:50%;cursor:pointer;}
+
+/* ============================================================
+   ROOT + BASE
+============================================================ */
+:root{
+  --green:#0b3d2e;
+  --pale:#ffffe0;
+  --off:#f8f8f5;
+  --line:#d7d7cf;
+  --warn:#B42318;
+  --barOD:#7EABD6;
+  --barOS:#7EABD6;
+  --frame:#915140;
+}
+
+html, body {
+  margin: 0;
+  background: var(--off);
+  color: #241D0C;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size: 20px;
+  letter-spacing: 0.15em;
+  -webkit-text-size-adjust: none;
+}
+
+* { font-size: 10px; }
+
+/* Remove number spinners */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+
+/* ============================================================
+   HEADINGS
+============================================================ */
+h1{font-size:10px;text-align:center;margin:12px 0 10px;}
+h2{text-align:center;margin-bottom:10px;}
+h3{font-size:10px;margin:0 0 8px;}
+.pane h4{margin:0 0 8px;font-size:10px;}
+
+
+
+/* ============================================================
+   PANELS & LAYOUT
+============================================================ */
+.pane {
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 5px;
+}
+
+.section {
+  background:var(--pale);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+  margin:10px 0;
+}
+
+.row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.field { gap:0; }
+.field.w90 { width:90px; }
+
+.tiny { font-size:10px; }
+.muted { opacity:1; }
+
+/* Buttons */
+button:focus { outline:2px solid #fff4; outline-offset:2px; }
+button:hover { filter:brightness(1); }
+button:active { transform:translateY(1px); }
+
+
+/* ============================================================
+   TABLES
+============================================================ */
+table {
+  width:90%;
+  margin:0 auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+th, td {
+  border:1px solid #999;
+  padding:5px;
+  text-align:center;
+  vertical-align: middle;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+th { background:#d9d9d9; color:black; }
+
+table input {
+  width:80%;
+  background:transparent;
+  border:none;
+  border-bottom:1px dashed #888;
+  padding:3px;
+  text-align:center;
+}
+
+/* Special row colors */
+.calibrator tr { background:#F5F5F5; }
+.calibrator td, .calibrator th { border:none !important; }
+
+.now td { background:#F5F5F5; }
+.now-comfort td { background:#F5F5F5; }
+.white td { background:#d9d9d9; }
+.fc-results td { background:#EFF5E6; }
+.dc-bal td { background:#fff; }
+.paleviolet td { background:#D0C5DB; }
+.paleblue td { background:#D8EFF8; }
+.table-headernow { background:#E8D1A0; }
+.comfort { background:#E5F0D1; }
+.offwhite { background:#f8f8f5; }
+
+table td:first-child,
+table th:first-child {
+  width: 18%;
+}
+
+table td:nth-child(2),
+table th:nth-child(2) {
+  width: 6%;
+}
+
+table td:nth-child(6),
+table th:nth-child(6) {
+  width: 10%;
+}
+
+table td:nth-child(7),
+table th:nth-child(7) {
+  width: 10%;
+}
+
+/* ============================================================
+   FONT SIZE MODES
+============================================================ */
+.font-S * { font-size:10px !important; }
+.font-M * { font-size:14px !important; }
+.font-L * { font-size:18px !important; }
+.font-XL * { font-size:22px !important; }
+
+.fixed-label { font-size:12px !important; }
+
+
+/* ============================================================
+   FONT SIZE BUTTONS
+============================================================ */
+.font-btn, .normal-btn, .small-normal-btn {
+  border:1px solid #999;
+  border-radius:4px;
+  cursor:pointer;
+  color:black;
+  background:#eee;
+  padding:2px 20px;
+  font-size:12px !important;
+}
+
+.font-btn.active {
+  background:#444;
+  color:#fff;
+  border-color:#222;
+}
+
+.normal-btn {
+  margin:10px 0;
+  border-radius:30px;
+}
+
+.normal-btn:focus {
+  background:#444;
+  color:#fff;
+  border-color:#222;
+}
+
+.small-normal-btn {
+  padding:5px 10px;
+  border-radius:30px;
+}
+
+
+/* ============================================================
+   SELECTS
+============================================================ */
+.dc-select {
+  width:80%;
+  padding:3px;
+  font-size:10px;
+  border-radius:4px;
+  border:1px solid #999;
+  text-align:center;
+}
+
+/* coloring */
+.dc-select option[value^="R"] { color:red; }
+.dc-select option[value^="G"] { color:green; }
+.dc-select option[value="BAL"] { color:black; }
+
+
+/* ============================================================
+   RADIO CHOICE GROUPS
+============================================================ */
+.choice-group {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.choice-group input[type=radio]{ display:none; }
+
+.choice-group label {
+  width:80%;
+  margin:1px auto;
+  padding:1px;
+  border:1px solid #888;
+  border-radius:4px;
+  background:#f9f9f9;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+}
+
+.choice-group input[type=radio]:not(:checked) + label {
+  text-decoration:line-through;
+  color:grey;
+}
+.choice-group input[type=radio]:checked + label {
+  background:#444;
+  color:#fff;
+  border-color:#222;
+}
+
+
+/* ============================================================
+   OVERLAY
+============================================================ */
+#overlay {
+  position:fixed;
+  inset:0;
+  background:#EDEADF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  z-index:9999;
+
+
+}
+
+
 </style>
 </head>
 <body>
 
-<canvas id="c" width="500" height="500"></canvas>
-
-<div>
-<input type="range" id="rotation" min="0" max="360" value="0" step="0.5">
-<label>Rotation: <span id="rotVal">0</span>°</label>
-</div>
-<div>
-<input type="range" id="maxBlur" min="0" max="20" value="8" step="0.1">
-<label>Max Blur: <span id="blurVal">8</span>px</label>
-</div>
+<!-- 🔒 Locked screen -->
+<div id="overlay">🔒 Entering password...</div>
 
 <script>
-const RAW="https://raw.githubusercontent.com/kiaraoptometrypx/RX_exam/main/fan_chart.png";
-const canvas=document.getElementById("c"), ctx=canvas.getContext("2d");
-const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;
+  function checkPassword() {
+    let password = "";
+    const correctPassword = ""; // change this
 
-let rotationDeg=0, maxBlur=8;
-
-// Base image
-const img=new Image();
-img.crossOrigin="anonymous"; img.src=RAW;
-
-// Create mask canvas
-const maskCanvas=document.createElement("canvas");
-maskCanvas.width=w; maskCanvas.height=h;
-const maskCtx=maskCanvas.getContext("2d");
-
-function createMask(){
-  const imgData=maskCtx.createImageData(w,h);
-  const data=imgData.data;
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const idx=(y*w+x)*4;
-      const dx=x-cx, dy=y-cy;
-      let theta=Math.atan2(dy,dx);
-
-      // New smoother angular distribution
-      let v=(Math.cos(2*theta)+1)/2; 
-      v=Math.pow(v,0.5);   // lower gamma = smoother steps
-      v = Math.min(Math.max(v,0),1); // clamp 0-1
-
-      data[idx]=255;       
-      data[idx+1]=255;
-      data[idx+2]=255;
-      data[idx+3]=Math.round(v*255); // alpha controls blur intensity
+    while (password !== correctPassword) {
+      password = prompt("Please enter password to use:");
+      if (password === null) {
+        document.getElementById("overlay").innerHTML = "Sorry, Access Denied.";
+        return false;
+      }
+      if (password !== correctPassword) {
+        alert("Wrong password. Try again.");
+      }
     }
+    return true;
   }
-  maskCtx.putImageData(imgData,0,0);
+
+  window.onload = function () {
+    if (checkPassword()) {
+      document.getElementById("overlay").style.display = "none";
+      // there's no #content in your original but leaving safe
+      const c = document.getElementById("content");
+      if(c) c.style.display = "block";
+    }
+  };
+</script>
+
+<div style="height:20px;"></div>
+<div class="wrap">
+
+  <!-- Right side: Font controls -->
+  <div style="text-align:right;">
+    <span class="fixed-label" style="cursor:pointer;user-select:none; margin-right:10px;">
+      Font:
+    </span>
+    <button class="font-btn" onclick="setFontSize('S', this)">S</button>
+    <button class="font-btn" onclick="setFontSize('M', this)">M</button>
+    <button class="font-btn" onclick="setFontSize('L', this)">L</button>
+    <button class="font-btn" onclick="setFontSize('XL', this)">XL</button>
+  </div>
+
+<script>
+function setFontSize(size, btn) {
+  document.body.classList.remove(
+    'font-S','font-M','font-L','font-XL'
+  );
+  document.body.classList.add('font-' + size);
+
+  // remove active from all buttons
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  // set active to clicked one
+  btn.classList.add('active');
+}
+</script>
+</div>
+
+
+
+<div class="wrap">
+<div class="section" style="text-align:center;">
+<br>
+ <span class="fixed-label"
+        style="user-select:none; font-weight:bold; display:inline-block;">
+    Welcome to Kiara Optometry's Algorithm Refraction
+  </span>
+<br><br>
+
+
+</div>
+
+
+<br>
+
+<div class="pane" style="padding:30px 10px 30px 10px;">
+
+<div style="display:flex; justify-content:center;">
+  <b><span>
+
+    Customer Details & Eye exam
+  </span></b>
+</div>
+
+
+
+<div id="customer-details"">
+<div style="height:30px;"></div>
+
+<div class="pane">
+
+
+
+
+
+
+<table>
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
+<tr class="white">
+  <td colspan="1"><b>Suffix</b></td>
+
+  <td colspan="3"><b>Name</b></td>
+  <td colspan="2"><b>Whatsapp</b></td>
+  <td><b>Age</b></td>
+</tr>
+
+<tr>
+  <!-- Suffix input -->
+  <td colspan="1">
+    <input type="text" id="Suffix" placeholder="Mr, Mrs">
+  </td>
+
+
+  <!-- Name input -->
+  <td colspan="3">
+    <input type="text" id="nameInput" placeholder="Aaron B. Carlson">
+  </td>
+<!-- Contact number input -->
+  <td colspan="2">
+    <input type="text" id="contactInput" placeholder="Contact Number">
+  </td>
+
+    <!-- Age -->
+  <td colspan="1"><input type="number" id="ageInput" min="1" max="120" oninput="calcAA()" placeholder="Years"></td>
+
+</tr>
+
+
+<tr>
+<td colspan="5" style="padding:5px; border:none;"></td>
+</tr>
+</table>
+
+
+
+<table>
+<tr class="white">
+    <td><b>Current RX</b></td>
+    <td><b>R/L</b></td>
+    <td><b>Sph</b></td>
+    <td><b>Cyl</b></td>
+    <td><b>Axis</b></td>
+    <td><b>SE Diff</b></td>
+    <td><b>Add</b></td>
+</tr>
+
+
+  <!-- Now RX -->
+  <tr>
+<td rowspan="2">
+  <div class="choice-group">
+    <input type="radio" id="current-wear-glasses" name="current-wearType" value="glasses">
+    <label for="current-wear-glasses">Glasses</label>
+</div>
+<div style="height:3px"></div>
+
+  <div class="choice-group">
+    <input type="radio" id="current-wear-contacts" name="current-wearType" value="contacts">
+    <label for="current-wear-contacts">Contacts</label>
+  </div>
+<div style="height:3px"></div>
+<div>BVD
+  <input type="number" id="bvdInput" value="13" step="0.5" min="5" max="20" style="width:30px; text-align:center;">
+</div>
+</td>
+    <td>R</td>
+    <td><input id="s1_od" placeholder="+0.00"></td>
+    <td><input id="c1_od" placeholder="+0.00"></td>
+    <td><input id="a1_od" placeholder="0"></td>
+    <td id="now-se-diff-od">—</td>
+<td rowspan="2">
+<input id="add-ou" placeholder="+0.00">
+</div></td>
+  </tr>
+
+  <tr>
+
+    <td>L</td>
+    <td><input id="s1_os" placeholder="+0.00"></td>
+    <td><input id="c1_os" placeholder="+0.00"></td>
+    <td><input id="a1_os" placeholder="0"></td>
+    <td>—</td>
+
+
+
+
+  <tbody class="toggle-section-near-rx" style="display:none;">
+<tr><td colspan="7" style="padding:5px; border:none;"></td></tr>
+
+<tr class="white">
+    <td><b>Current Add</b></td>
+    <td colspan="3"><b>Screen Length (cm) & Estimated Inter Add</b></td>
+    <td colspan="3"><b>Phone Length (cm) & Estimated Near Add</b></td>
+</tr>
+<tr>
+
+    <td>-</td>
+    <td colspan="3" style="text-align:left;">
+    <label for="targetDistInput2" style="display:none;">Screen:</label>
+    <input type="number" id="targetDistInput2" min="0" placeholder="50" style="max-width:35px; margin: 0px 0px 0px 10px">
+    &nbsp;&nbsp;&nbsp;<span id="addOutput2">Key In Age First</span>
+    </td>
+    <td colspan="3" style="text-align:left;">
+    <label for="targetDistInput" style="display:none;">Book</label>
+    <input type="number" id="targetDistInput" min="0" placeholder="33" style="max-width:35px; margin: 0px 0px 0px 10px">
+    &nbsp;&nbsp;&nbsp;<span id="addOutput">Key In Age First</span>
+    </td>
+</tr>
+
+  <td colspan="1" id="toleranceOutput" style="display:none;">–</td>
+  <td style="display:none;"><b>AA Dist</b></td>
+  <td style="display:none;"></td>
+  <td style="display:none;"><span id="distOutput">–</span></td>
+  <td style="display:none;"colspan="1" id="healthyDistOutput">–</td>
+  <td style="display:none;">Current Eye Strength: <span id="aaOutput">–</span>
+</td>
+</tr>
+
+</table>
+</tbody>
+</div>
+
+
+
+
+<div style="height:10px;"></div>
+
+    <div class="pane" style="padding:0 0 10px 0;">
+
+
+<span id="toggle-manual1" style="margin-left:5%; cursor:pointer; user-select:none;">▼ Manual</span>
+
+
+<div id="exam-manual1" style="display:none">
+<div id="exam-manual">
+
+<table>
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
+<tr class="paleblue noprint">
+  <td colspan="2" style="padding:10px; color: #241D0C; text-align:left; border-right:none;">
+<b>Manual Input Rx</b></td>
+<td colspan="2" style="text-align:left; border-left:none;">
+<span id="testToggle2" style="cursor:pointer; user-select:none; color: #101F01;">
+  <b><i>● Status?</i></B>
+</td>
+<td colspan="3" style="padding:10px; text-align:left;">
+    <span style="margin-left:15px;  margin-right:15px; text-decoration:none; cursor:pointer; color:#101F01; user-select:none;"
+          onclick="event.stopPropagation(); let t=document.getElementById('deficit-rows-manual'); t.style.display=t.style.display==='none'?'table-row-group':'none';">
+     ▼▲ Test
+    </span>
+
+<span class="toggle-btn" data-target="toggle-section-manual-rx"
+          style="cursor:pointer; color: #101F01; user-select:none;">
+      ▼▲ Results 
+    </span>
+</td>
+</tr>
+
+
+  <tbody id="deficit-rows-manual">
+
+
+
+
+
+  <tr class="white">
+<td colspan="1"><b>Test</b></td>
+<td><b>R/L</b></td>
+<td><b>Sph</b></td>
+<td colspan="1"><b>Cyl</b></td>
+<td colspan="1"><b>Axis</b></td>
+<td><b>SE Diff</b></td>
+<td><b>DC</b></td>
+  </tr>
+
+<tr class="now">
+    <td rowspan="3">
+    <b>Adjusted<br>FC DC Error<b><br>
+  <select id="fc-dc-error" class="dc-select" style="margin-top:4px;">
+    <option value="">Exam Type</option>
+    <option>BE Bino</option>
+    <option>R&L Mono</option>
+  </select>
+</td>
+
+<td style="height:25px">BE</td>
+
+    <td><input id="dc-sph-ou-manual-notes" placeholder="+0.00"></td>
+    <td><input id="c2_ou_manual_notes" placeholder="+0.00"></td>
+    <td><input id="a2_ou_manual_notes" placeholder="0"></td>
+    <td id="def-se-diff-oU-notes">—</td>
+    <td id="now-dc-ou-notes">BAL</td> 
+  </tr>
+
+<tr class="now">
+<td style="height:25px">R</td>
+
+    <td><input id="dc-sph-od-manual-notes" placeholder="+0.00"></td>
+    <td><input id="c2_od_manual_notes" placeholder="+0.00"></td>
+    <td><input id="a2_od_manual_notes" placeholder="0"></td>
+    <td id="def-se-diff-od-notes">—</td>
+    <td id="now-dc-od-notes">BAL</td> 
+  </tr>
+
+<tr class="now">
+<td style="height:25px">L</td>
+
+    <td><input id="dc-sph-os-manual-notes" placeholder="+0.00"></td>
+    <td><input id="c2_os_manual_notes" placeholder="+0.00"></td>
+    <td><input id="a2_os_manual_notes" placeholder="0"></td>
+    <td id="def-se-diff-os-notes">—</td>
+    <td id="now-dc-os-notes">BAL</td> 
+  </tr>
+</td></tr>
+
+
+
+
+
+</tbody>
+
+
+
+
+<tbody class="toggle-section-manual-rx">
+
+<tr class="paleblue">
+  <td><b>Final Rx</b></td>
+  <td><b>R/L</b></td>
+  <td><b>Sph</b></td>
+  <td><b>Cyl</b></td>
+  <td><b>Axis</b></td>
+  <td><b>SE Diff</b></td>
+  <td><b>DC</b></td>
+</tr>
+
+<!-- Right Eye -->
+<tr class="paleblue">
+  <td style="border-bottom:none;">
+    <div class="choice-group">
+      <input type="radio" id="manual-ou-wear-glasses" name="manual-ou-wear" value="glasses">
+      <label for="manual-ou-wear-glasses">Glasses</label>
+    </div>
+  </td>
+  <td style="height:25px">R</td>
+  <!-- use text so + is allowed; keep numeric keypad -->
+  <td><input type="text" id="manual-sph-ou-od" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+  <td><input type="text" id="manual-cyl-ou-od" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+  <td><input type="number" id="manual-axis-ou-od" placeholder="0" step="1" min="0" max="180"></td>
+  <td id="manual-se-diff-ou">+0.00</td>
+  <td>
+<select id="manual-dc-ou-od" class="dc-select">
+  <option value="BAL">BAL</option>
+<option value="G1">G1</option>
+<option value="R1">R1</option>
+
+<option value="G2">G2</option>
+<option value="R2">R2</option>
+
+<option value="G3">G3</option>
+<option value="R3">R3</option>
+
+</select>
+  </td>
+</tr>
+
+<!-- Left Eye -->
+<tr class="paleblue">
+  <td style="border-top:none;">
+    <div class="choice-group">
+      <input type="radio" id="manual-ou-wear-contacts" name="manual-ou-wear" value="contacts">
+      <label for="manual-ou-wear-contacts">Contacts</label>
+    </div>
+  </td>
+  <td style="height:25px">L</td>
+  <td><input type="text" id="manual-sph-ou-os" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+  <td><input type="text" id="manual-cyl-ou-os" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+  <td><input type="number" id="manual-axis-ou-os" placeholder="0" step="1" min="0" max="180"></td>
+  <!-- If you don't actually want per-eye SE shown, you can remove this cell; code guards it. -->
+  <td>—</td>
+  <td>
+<select id="manual-dc-ou-os" class="dc-select">
+  <option value="BAL">BAL</option>
+<option value="G1">G1</option>
+<option value="R1">R1</option>
+
+<option value="G2">G2</option>
+<option value="R2">R2</option>
+
+<option value="G3">G3</option>
+<option value="R3">R3</option>
+
+</select>
+  </td>
+</tr>
+<tr class="paleblue">
+  <!-- This cell spans 2 rows -->
+  <td rowspan="2" colspan="1"><b>Extra Notes:</b></td>
+  <td colspan="6" rowspan="2">
+    <textarea id="extra-notes-manual" rows="2" placeholder="Type anything here..." 
+  style="width:95%; height:60px; box-sizing:border-box;"></textarea>
+
+  </td>
+</tr>
+<tr></tr>
+
+
+<tr class="paleblue noprint">
+  <td colspan="7" style="padding:2px;"><i>~ End ~</i></td>
+</tr>
+</tbody>
+
+</table>
+</div>
+</div>
+
+
+<div id="exam-comfy">
+<table>
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
+<tr class="comfort noprint">
+    <td colspan="2" style="padding:10px; color: #241D0C; text-align:left; border-right:none;">
+<b>Comfy Clearer Rx</b></td>
+<td colspan="2" style="text-align:left; border-left:none;">
+<span id="testToggle1" style="cursor:pointer; user-select:none; color: #101F01; margin-left:px;">
+  <b><i>● Status?</i></B>
+
+
+</td>
+<td colspan="3" style="padding:10px; color: #241D0C; text-align:left;">
+    <span style="margin-left:15px;  margin-right:15px; text-decoration:none; cursor:pointer; user-select:none;"
+          onclick="event.stopPropagation(); let t=document.getElementById('deficit-rows-comfort'); t.style.display=t.style.display==='none'?'table-row-group':'none';">
+     ▼▲ Test
+    </span>
+
+<span class="toggle-btn" data-target="toggle-section-comfort-rx"
+          style="cursor:pointer; color: #101F01; user-select:none; margin-right:15px;">
+      ▼▲ Results 
+    </span>
+
+</td>
+
+  </td>
+</tr>
+
+
+
+
+  <tbody id="deficit-rows-comfort">
+
+
+
+
+
+  <!-- Deficit Rows -->
+  <tr class="white">
+<td colspan="1"><b>Test</b></td>
+<td><b>R/L</b></td>
+<td><b>Sph</b></td>
+<td colspan="1"><b>Cyl</b></td>
+<td colspan="1"><b>Axis</b></td>
+<td><b>SE Diff</b></td>
+<td><b>DC</b></td>
+ 
+<tr class="white noprint">
+    <td rowspan="1">FC DC Error<br>Notes</td>
+<td>BE</td>
+
+    <td><input id="dc-sph-ou-notes" placeholder="+0.00"></td>
+    <td><input id="c2_ou_notes" placeholder="+0.00"></td>
+    <td><input id="a2_ou_notes" placeholder="0"></td>
+    <td id="def-se-diff-ou-notes">—</td>
+    <td id="now-dc-ou-notes">BAL</td> 
+  </tr>
+
+<tr class="now">
+    <td><b>Adjusted<br>FC DC Error<b></td>
+<td>BE</td>
+    <td><input id="dc-sph-ou" placeholder="+0.00"></td>
+    <td><input id="c2_ou" placeholder="+0.00"></td>
+    <td><input id="a2_ou" placeholder="0"></td>
+    <td id="def-se-diff-ou">—</td>
+    <td id="dc-ou">—</td>
+  </tr>
+
+<tr class="now">
+    <td><b>Intermediate<br>DC Error<b></td>
+<td>BE</td>
+    <td><input id="inter-dc-sph-ou" placeholder="+0.00"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+<tr class="now">
+    <td><b>Near<br>DC Error<b></td>
+<td>BE</td>
+    <td><input id="near-dc-sph-ou" placeholder="+0.00"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+
+
+<tr class="now noprint" style="display:none">
+  <td rowspan="2">FC DC<br>Balance</td>
+<td>R</td>
+  <td id="final-sph-ou-re">0.00</td>
+  <td id="final-cyl-ou-re">0.00</td>
+  <td id="final-axis-ou-re">0</td>
+  <td id="final-se-ou-re" style="display:none;">—</td>
+  <td id="bypass-final-ou">—</td>
+  <td id="final-dc-ou-re">—</td>
+</tr>
+<tr class="now noprint" style="display:none">
+ <td>L</td>
+
+  <td id="final-sph-ou-le">0.00</td>
+  <td id="final-cyl-ou-le">0.00</td>
+  <td id="final-axis-ou-le">0</td>
+  <td id="final-se-ou-le" style="display:none;">—</td>
+  <td>—</td>
+  <td id="final-dc-ou-le">—</td>
+</tr>
+
+
+
+
+</tbody>
+
+
+<tbody class="toggle-section-comfort-rx" style="display:none">
+
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
+
+<tr class="comfort">
+<td><b>Final RX</b></td>
+<td><b>R/L</b></td>
+<td><b>Sph</b></td>
+<td><b>Cyl</b></td>
+<td><b>Axis</b></td>
+<td><b>SE Diff</b></td>
+<td><b>DC</b></td>
+  </tr>
+
+<tr class="comfort">
+<td style="border-bottom:none;">
+  <div class="choice-group">
+    <input type="radio" id="wear-glasses" name="wearType" value="glasses">
+    <label for="wear-glasses">Glasses</label>
+</div>
+</td>
+
+<td>R</td>
+
+    <td id="res-sph-ou-re">0.00</td>
+    <td id="res-cyl-ou-re">0.00</td>
+    <td id="res-axis-ou-re">0</td>
+    <td id="res-se-diff-ou-re">—</td>
+    <td id="res-dc-ou-re">BAL</td>
+  </tr>
+
+<tr class="comfort">
+<td style="border-top:none;">
+  <div class="choice-group">
+    <input type="radio" id="wear-contacts" name="wearType" value="contacts">
+    <label for="wear-contacts">Contacts</label>
+  </div>
+</td>
+ <td>L</td>
+    <td id="res-sph-ou-le">0.00</td>
+    <td id="res-cyl-ou-le">0.00</td>
+    <td id="res-axis-ou-le">0</td>
+    <td >—</td>
+    <td id="res-dc-ou-le">BAL</td>
+  </tr>
+
+<tr class="comfort">
+    <td style="height:20px">Inter Add</td>
+<td>BE</td>
+    <td><div id="result-inter">+0.00</div></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+<tr class="comfort">
+    <td style="height:20px">Near Add</td>
+<td>BE</td>
+    <td><div id="result-near">+0.00</div></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+
+<tr class="adjustments noprint">
+<td colspan="7">
+<span onclick="toggleRow('adjustments-row-1')" 
+   style="cursor:pointer; color:black; user-select:none; margin:0px 30px;">
+  ▼▲ Adjustments
+</span>
+
+ <span class="toggle-btn" data-target="toggle-section-comfort-analysis" 
+      style="margin-left:0px; margin-right:15px; user-select:none; cursor:pointer; color: #241D0C; user-select:none;">
+▼▲ Analysis
+</span>
+
+</td>
+</tr>
+
+
+
+<tr class="adjustments noprint" id="adjustments-row-1" style="display:none;">
+  <td>Adjustments</td>
+  <td>B</td>
+  <td colspan="5" style="padding:0px; text-align:left;">
+    <div>
+      <!-- Clickable control to apply -0.25 x 180 -->
+      <span class="addMinus025" role="button" 
+            style="cursor:pointer; user-select:none; margin-right:10px; margin-left:20px;">
+        Apply -0.25 × 180
+      </span>
+
+      ● 
+     <span class="sph-btn" data-group="ou" data-step="-0.25"
+            style="cursor:pointer; text-decoration:none; color:green; margin-right:5px;">
+        S-0.25
+      </span>
+
+      <span class="sph-btn" data-group="ou" data-step="0.25"
+            style="cursor:pointer; text-decoration:none; color:red; margin-right:10px;">
+        S+0.25
+      </span>= <span id="dc-advice" style=" font-weight:normal; color:black;">
+  <!-- DC advice will show here -->
+</span>
+    </div>
+
+  </td>
+</tr>
+<tr class="comfort">
+  <td rowspan="2" colspan="1"><b>Extra Notes:</b></td>
+  <td colspan="6" rowspan="2">
+    <textarea id="extra-notes-comfy" rows="2" placeholder="Type anything here..." 
+  style="width:95%; height:60px; box-sizing:border-box;"></textarea>  </td>
+</tr>
+
+
+<tr></tr>
+
+<tr class="comfort noprint">
+  <td colspan="7" style="padding:2px;"><i>~ End ~</i></td>
+</tr>
+
+<tbody class="toggle-section-comfort-analysis" style="display:none;">
+
+<tr class="comfort">
+<td id="analysis-ou" colspan="7" style="text-align:left; padding-left:20px; border-bottom:none;"></td>
+</td>
+</tr>
+<tr class="comfort">
+<td id="analysis-ou-sph" colspan="7" style="text-align:left; padding-left:20px; border-bottom:none; border-top:none;"></td>
+</tr>
+<tr class="comfort">
+<td colspan="7" style="text-align:left; padding-left:20px; border-top:none;">
+<span id="analysis-ou-cylax"></span><br><br>
+</td>
+</tr>
+
+
+</tbody>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+<!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ----><!--- Sharper RX ---->
+
+
+
+
+<div id="exam-sharpest" style="display:none;">
+
+
+<table>
+<tr class="calibrator">
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+  <td style="border:none;"></td>
+</tr>
+<tr class="paleviolet">
+  <td colspan="2" style="padding:10px; color: #241D0C; text-align:left; border-right:none;">
+<b>Sharpest Ever Rx</b></td>
+<td colspan="2" style="text-align:left; border-left:none;">
+<span id="testToggle2" style="cursor:pointer; user-select:none; color: #241D0C;">
+  <b><i>● Status?</i></B>
+</span>&nbsp;&nbsp;&nbsp;
+
+</td>
+<td colspan="3" style="padding:10px; color: #241D0C; text-align:left;">
+<span style="margin-left:15px; margin-right:15px; text-decoration:none; cursor:pointer; color:#241D0C; user-select:none;"
+          onclick="event.stopPropagation(); let t=document.getElementById('deficit-rows-sharper'); t.style.display=t.style.display==='none'?'table-row-group':'none';">
+      ▼▲ Test
+    </span>
+
+ <span class="toggle-btn" data-target="toggle-section-sharper-rx" 
+      style="margin-left:0px; margin-right:15px; user-select:none; cursor:pointer; color: #241D0C; user-select:none;">
+▼▲ Results
+</span>
+
+</td>
+</tr>
+
+<!-- Deficit Rows (wrapped in toggle container) -->
+<tbody id="deficit-rows-sharper" style="display:none;">
+<tr>
+<td colspan="7" style="padding:1px; border:none;"></td>
+</tr>
+
+  <tr class="white">
+<td colspan="1"><b>Test</b></td>
+<td><b>R/L</b></td>
+<td><b>Sph</b></td>
+<td colspan="1"><b>Cyl</b></td>
+<td colspan="1"><b>Axis</b></td>
+<td><b>SE Diff</b></td>
+<td><b>DC</b></td>
+
+  </tr>
+
+  <tr class="white">
+    <td rowspan="2">FC DC Error<br>Notes</td>
+<td>R</td>
+
+    <td><input id="dc-sph-od-notes" placeholder="+0.00"></td>
+    <td><input id="c2_od_notes" placeholder="+0.00"></td>
+    <td><input id="a2_od_notes" placeholder="0"></td>
+    <td id="def-se-diff-od-notes">—</td>
+    <td id="now-dc-od-notes">BAL</td> 
+  </tr>
+
+  <tr class="white">
+<td>L</td>
+
+    <td><input id="dc-sph-os-notes" placeholder="+0.00"></td>
+    <td><input id="c2_os_notes" placeholder="+0.00"></td>
+    <td><input id="a2_os_notes" placeholder="0"></td>
+    <td id="def-se-diff-os-notes">—</td>
+    <td id="now-dc-os-notes">BAL</td> 
+  </tr>
+
+
+  <tr class="now">
+    <td rowspan="2"><B>Adjusted<br>FC DC Error</b></td>
+<td>R</td>
+
+    <td><input id="dc-sph-od" placeholder="+0.00"></td>
+    <td><input id="c2_od" placeholder="+0.00"></td>
+    <td><input id="a2_od" placeholder="0"></td>
+    <td id="def-se-diff-od">—</td>
+    <td id="now-dc-od">—</td> 
+  </tr>
+
+  <tr class="now">
+<td>L</td>
+
+    <td><input id="dc-sph-os" placeholder="+0.00"></td>
+    <td><input id="c2_os" placeholder="+0.00"></td>
+    <td><input id="a2_os" placeholder="0"></td>
+    <td id="def-se-diff-os">—</td>
+    <td id="now-dc-os">—</td> 
+  </tr>
+
+  <tr class="now">
+    <td rowspan="2">FC DC<br>Balance</td>
+<td>Right</td>
+
+    <td id="final-sph-od">0.00</td>
+    <td id="final-cyl-od">0.00</td>
+    <td id="final-axis-od">0</td>
+    <td id="final-se-od" style="display:none;">—</td>
+    <td id="bypass-final-mono">—</td>
+    <td id="final-dc-od">BAL </td>
+  
+  </tr>
+  <tr class="now">
+    <td>Left</td>
+    <td id="final-sph-os">0.00</td>
+    <td id="final-cyl-os">0.00</td>
+    <td id="final-axis-os">0</td>
+    <td id="final-se-os" style="display:none;">—</td>
+    <td>—</td>
+    <td id="final-dc-os">BAL </td>
+    
+  </tr>
+
+</tbody>
+
+
+<tbody class="toggle-section-sharper-rx" style="display:none;">
+<tr>
+<td colspan="7" style="padding:1px; border:none;"></td>
+</tr>
+  <tr class="paleviolet">
+<td><b>Results</b></td>
+<td><b>Sides</b></td>
+<td><b>Sph</b></td>
+<td><b>Cyl</b></td>
+<td><b>Axis</b></td>
+<td><b>SE Diff</b></td>
+<td><b>DC</b></td>
+  </tr>
+
+  <tr class="paleviolet">
+    <td rowspan="2">Final RX<br>-----<br>
+<span id="toggleAdjustments2" 
+      style="cursor:pointer; user-select:none; color: #241D0C;">
+  ▼▲ Adjust
+</span></td>
+<td>Right</td>
+    <td id="res-sph-od-2">0.00</td>
+    <td id="res-cyl-od-2">0.00</td>
+    <td id="res-axis-od-2">0</td>
+    <td id="res-se-od-2" style="display:none;">—</td>
+    <td id="bypass">—</td>
+    <td id="res-dc-od-2">BAL</td> 
+  </tr>
+  <tr class="paleviolet">
+    <td>Left</td>
+    <td id="res-sph-os-2">0.00</td>
+    <td id="res-cyl-os-2">0.00</td>
+    <td id="res-axis-os-2">0</td>
+    <td>—</td>    
+    <td id="res-se-os-2" style="display:none;">—</td>
+    <td id="res-dc-os-2">BAL</td> 
+  </tr>
+
+<tr class="now-comfort adj2" style="display:none;">
+
+<td rowspan="3">Adjustments</td>
+<td style="display:none;">Both</td>
+<td colspan="5" style="padding:7px; text-align:left; display:none;">
+ <!-- Clickable control to apply -0.25 x 180 -->
+
+    <span class="addMinus025" role="button" 
+          style="cursor:pointer; user-select:none; margin-right:30px; margin-left:20px;">
+      Apply -0.25 × 180
+    </span> 
+●
+<!-- SPH Controls -->
+    <span class="sph-btn" data-group="mono" data-step="-0.25"
+          style="cursor:pointer; text-decoration:none; color:green; margin-right:5px; margin-left:0px;">
+     S-0.25
+   </span>
+    <span class="sph-btn" data-group="mono" data-step="0.25"
+          style="cursor:pointer; text-decoration:none; color:red; margin-right:30px; margin-left:0px;">
+     S+0.25
+</span>
+
+</td>
+</tr>
+
+<tr class="now-comfort adj2" style="display:none;">
+<td>Right</td>
+<td colspan="5" style="padding:7px; text-align:left;">
+    <span class="addMinus025" role="button" 
+          style="cursor:pointer; user-select:none; margin-right:30px; margin-left:20px;">
+      Apply -0.25 × 180
+    </span> 
+●
+<span class="sph-btn-mono" data-eye="od" data-step="-0.25"
+          style="cursor:pointer; user-select:none; text-decoration:none; color:green; margin-right:5px; margin-left:0px;">
+     S-0.25
+   </span>
+<span class="sph-btn-mono" data-eye="od" data-step="0.25"
+          style="cursor:pointer; user-select:none; text-decoration:none; color:red; margin-right:30px; margin-left:0px;">
+     S+0.25
+</span>
+
+
+<tr class="now-comfort adj2" style="display:none;">
+<td>Left</td>
+<td colspan="5" style="padding:7px; text-align:left;">
+    <span class="addMinus025" role="button" 
+          style="cursor:pointer; user-select:none; margin-right:30px; margin-left:20px;">
+      Apply -0.25 × 180
+    </span> 
+●
+<span class="sph-btn-mono" data-eye="os" data-step="-0.25"
+          style="cursor:pointer; user-select:none; text-decoration:none; color:green; margin-right:5px; margin-left:0px;">
+     S-0.25
+   </span>
+<span class="sph-btn-mono" data-eye="os" data-step="0.25"
+          style="cursor:pointer; user-select:none; text-decoration:none; color:red; margin-right:30px; margin-left:0px;">
+     S+0.25
+</span>
+
+</td></tr>
+<tr><td colspan="7">
+<span class="toggle-btn" data-target="toggle-section-sharper-analysis"
+          style="cursor:pointer; color: #101F01; user-select:none; text-align:middle;">
+    ▼▲ Analysis
+    </span>
+</td></tr>
+
+
+  <tr class="paleviolet">
+<tr class="paleviolet">
+  <td rowspan="2" colspan="1"><b>Extra Notes:</b></td>
+  <td colspan="6" rowspan="2">
+    <textarea id="extra-notes-sharper" rows="2" placeholder="Type anything here..." 
+  style="width:95%; height:60px; box-sizing:border-box;"></textarea>
+
+  </td>
+</tr>
+<tr></tr>
+<tr class="paleviolet">
+  <td colspan="7" style="padding:2px;"><i>~ End ~</i></td>
+</tr>
+</tbody>
+
+
+<tbody class="toggle-section-sharper-analysis" style="display:none;">
+  <tr class="paleviolet">
+    <td id="analysis-od-os" colspan="7" style="text-align:left; padding-left:20px;">
+    <!-- Combined analysis text for OD OS will appear here -->'
+</td>
+</tr>
+
+</tbody>
+</table>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE ----->
+
+
+<!-- script for AA calculator & change tolerance (keep this below the row) -->
+
+<script>
+function roundDownToQuarter(value) {
+  return Math.floor(value / 0.25) * 0.25;
 }
 
-function draw(){
-  ctx.clearRect(0,0,w,h);
-  ctx.drawImage(img,0,0,w,h);
-
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.rotate(rotationDeg*Math.PI/180);
-  ctx.translate(-cx,-cy);
-
-  // Stronger blur with smooth transition
-  ctx.filter=`blur(${maxBlur}px)`;
-  ctx.globalCompositeOperation="destination-in";
-  ctx.drawImage(maskCanvas,0,0);
-  ctx.restore();
-
-  ctx.globalCompositeOperation="source-over";
-  ctx.filter="none";
+// Convert diopters into distance in cm
+function diopterToDistanceCm(D) {
+  if (D <= 0) return "∞";
+  let meters = 1 / D;
+  return (meters * 100).toFixed(0) + " cm";
 }
 
-img.onload=()=>{
-  createMask();
-  draw();
+// Healthy distance = (AA + 0.00 D) → convert to distance
+function healthyDistance(D) {
+  let healthyD = D + 0.00;
+  if (healthyD <= 0) return "None";
+
+  let cm = parseInt(diopterToDistanceCm(healthyD), 10); // convert to number
+  let displayCm = cm > 100 ? 100 : cm;                   // cap display only
+
+  return displayCm + " cm";
 }
 
-// Sliders
-document.getElementById("rotation").addEventListener("input", e=>{
-  rotationDeg=+e.target.value;
-  document.getElementById("rotVal").textContent=rotationDeg;
-  draw();
+// Curved AA formula
+function calculateAA(age) {
+  const AA_young = 18.5; // Peak AA
+  const AA_min = 0.33;   // Minimum AA
+  const k = 0.1;         // Decay rate
+  const age0 = 20;       // Reference age
+
+  let aa = AA_min + (AA_young - AA_min) * Math.exp(-k * (age - age0));
+  if (aa < AA_min) aa = AA_min;
+  return aa;
+}
+
+// Calculate Add Needed (numeric value)
+function addNeeded(aa, workingCm) {
+  if (workingCm <= 0) return "–";
+  let targetD = 100 / workingCm;        // convert cm to diopters
+  let gap = targetD - aa;               // difference
+  let add = gap + 0.50;                 // add 0.50 D buffer
+  if (add < 0) add = 0;                 // limit to 0 if negative
+  return parseFloat(add.toFixed(2));
+}
+
+// Format Add Needed as range
+function addNeededRange(add) {
+  if (add === "–") return "–";
+
+  // Round UP to nearest 0.25
+  let upper = Math.ceil(add / 0.25) * 0.25;
+
+  // Lower bound is 0.50 D less
+  let lower = upper - 0.50;
+  if (lower < 0) lower = 0;
+
+  return "From +" + lower.toFixed(2) + "  to +" + upper.toFixed(2);
+}
+
+// Calculate change tolerance with age-based limiter
+function changeTolerance(aa, age) {
+  if (typeof aa !== 'number' || aa <= 0) return "0 (0.00 D)";
+  if (typeof age !== 'number' || age <= 0) age = 99; // fallback
+
+  // Original formula
+  let original = aa * 0.10 + 0.15;
+
+  // Age-based multiplier limiter
+  let multiplier = 1; // default no limit
+  if (age >= 18 && age <= 25) multiplier = 0.3;
+  else if (age >= 14 && age <= 17) multiplier = 0.25;
+  else if (age >= 9 && age <= 13) multiplier = 0.2;
+  else if (age <= 8) multiplier = 0.15;
+
+  let ageLimited = ((original - 1.75) * multiplier) + 1.75;
+
+  // Apply limiter
+  if (original > ageLimited) original = ageLimited;
+
+  // Round to nearest 0.25 for display
+  let rounded = Math.round(original / 0.25) * 0.25;
+
+  return original.toFixed(2) + ' (' + rounded.toFixed(2) + ' D)';
+}
+
+
+
+
+// Main calculation function
+function calcAA() {
+  const ageEl = document.getElementById('ageInput');
+  const aaEl = document.getElementById('aaOutput');
+  const distEl = document.getElementById('distOutput');
+  const healthyEl = document.getElementById('healthyDistOutput');
+
+  const tdInputEl = document.getElementById('targetDistInput');   // target distance (cm)
+  const addEl = document.getElementById('addOutput');             // Add Needed
+  const toleranceEl = document.getElementById('toleranceOutput'); // Change Tolerance
+
+  const age = parseFloat(ageEl.value);
+  const tdCm = parseFloat(tdInputEl.value);
+
+  if (isNaN(age) || age <= 0) {
+    aaEl.textContent = '–';
+    distEl.textContent = '–';
+    healthyEl.textContent = '–';
+    addEl.textContent = '–';
+    toleranceEl.textContent = '–';
+    return;
+  }
+
+  // Calculate AA (curved)
+  let aa = calculateAA(age);
+
+  // Bracket AA
+  let bracket = roundDownToQuarter(aa);
+  if (bracket < 0) bracket = 0;
+
+  // Display AA and distances
+  aaEl.textContent = aa.toFixed(2) + ' D (' + bracket.toFixed(2) + ' D)';
+  distEl.textContent = diopterToDistanceCm(bracket);
+  healthyEl.textContent = healthyDistance(bracket);
+
+function calcAA2() {
+  const tdInputEl2 = document.getElementById('targetDistInput2');
+  const addEl2 = document.getElementById('addOutput2');
+
+  const ageEl = document.getElementById('ageInput'); // same age used
+  const age = parseFloat(ageEl.value);
+  const tdCm2 = parseFloat(tdInputEl2.value);
+
+  if (isNaN(age) || age <= 0 || isNaN(tdCm2) || tdCm2 <= 0) {
+    addEl2.textContent = '–';
+    return;
+  }
+
+  let aa = calculateAA(age);          // reuse same AA function
+  let addVal = addNeeded(aa, tdCm2);  // reuse same Add Needed function
+  addEl2.textContent = addNeededRange(addVal);
+}
+
+// Live update for second calculator
+document.getElementById('targetDistInput2').addEventListener('input', calcAA2);
+document.getElementById('ageInput').addEventListener('input', calcAA2);
+
+
+  // Calculate Add Needed and display as range
+  if (!isNaN(tdCm) && tdCm > 0) {
+    let addVal = addNeeded(aa, tdCm);
+    addEl.textContent = addNeededRange(addVal);
+  } else {
+    addEl.textContent = '–';
+  }
+
+  // Display change tolerance (12% of AA)
+let tolerance = changeTolerance(aa, age);
+toleranceEl.textContent = tolerance;
+
+}
+
+// Live update
+document.getElementById('ageInput').addEventListener('input', calcAA);
+document.getElementById('targetDistInput').addEventListener('input', calcAA);
+document.getElementById('ageInput').addEventListener('input', () => {
+    updateODOSAnalysis();
+    updateOUAnalysis();
 });
 
-document.getElementById("maxBlur").addEventListener("input", e=>{
-  maxBlur=+e.target.value;
-  document.getElementById("blurVal").textContent=maxBlur;
-  draw();
+
+</script>
+
+<!-- script for AA calculator -->
+
+
+<script>
+function formatQuarter(val) {
+  const num = parseFloat(val);
+  if (isNaN(num)) return "";
+  const r = Math.round(num / 0.25) * 0.25;
+  return (r >= 0 ? "+" : "") + r.toFixed(2);
+}
+
+function formatAxis(val) {
+  let num = parseInt(val, 10);
+  if (isNaN(num)) return "";
+  if (num < 0) num = 0;
+  if (num > 180) num = 180;
+  return String(Math.round(num));
+}
+
+function calcSE(s, c) {
+  if (isNaN(s)) s = 0;   // default sph to 0
+  if (isNaN(c)) c = 0;   // default cyl to 0
+  return s + (c / 2);
+}
+
+function calcSE(s, c) {
+  if (isNaN(s)) s = 0;
+  if (isNaN(c)) c = 0;
+  return s + (c / 2);
+}
+
+function updateManualOU() {
+  // Right Eye
+  let sOD = parseFloat(document.getElementById("manual-sph-ou-od").value);
+  let cOD = parseFloat(document.getElementById("manual-cyl-ou-od").value);
+  let aOD = document.getElementById("manual-axis-ou-od").value;
+
+  if (aOD !== "") document.getElementById("manual-axis-ou-od").value = formatAxis(aOD);
+
+  const SEod = calcSE(sOD, cOD);
+  const seOdEl = document.getElementById("manual-se-ou-od");
+  if (seOdEl) seOdEl.textContent = isNaN(SEod) ? "—" : formatQuarter(SEod);
+
+  // Left Eye
+  let sOS = parseFloat(document.getElementById("manual-sph-ou-os").value);
+  let cOS = parseFloat(document.getElementById("manual-cyl-ou-os").value);
+  let aOS = document.getElementById("manual-axis-ou-os").value;
+
+  if (aOS !== "") document.getElementById("manual-axis-ou-os").value = formatAxis(aOS);
+
+  const SEos = calcSE(sOS, cOS);
+  const seOsEl = document.getElementById("manual-se-ou-os");
+  if (seOsEl) seOsEl.textContent = isNaN(SEos) ? "—" : formatQuarter(SEos);
+
+// SE Diff
+const diffEl = document.getElementById("manual-se-diff-ou");
+if (diffEl) {
+  if (isNaN(SEod) && isNaN(SEos)) {
+    diffEl.textContent = "—";
+  } else {
+    const diff = Math.abs((isNaN(SEod) ? 0 : SEod) - (isNaN(SEos) ? 0 : SEos));
+    diffEl.textContent = (diff >= 0 ? "+" : "") + diff.toFixed(2);
+  }
+}
+}
+
+// --- Event bindings ---
+[
+  "manual-sph-ou-od","manual-cyl-ou-od","manual-axis-ou-od",
+  "manual-sph-ou-os","manual-cyl-ou-os","manual-axis-ou-os"
+].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  // Live updates while typing
+  el.addEventListener("input", updateManualOU);
+
+  // Snap to 0.25 when leaving the field
+  if (id.includes("sph") || id.includes("cyl")) {
+    el.addEventListener("blur", () => {
+      let val = parseFloat(el.value);
+      if (!isNaN(val)) el.value = formatQuarter(val);
+      updateManualOU();
+    });
+  }
+});
+
+
+
+// Auto-update on any change while typing
+[
+  "manual-sph-ou-od","manual-cyl-ou-od","manual-axis-ou-od",
+  "manual-sph-ou-os","manual-cyl-ou-os","manual-axis-ou-os"
+].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", updateManualOU);
+});
+
+// DC colorize (persists)
+function updateDCcolor(sel) {
+  const v = sel.value || "";
+  if (v.startsWith("R")) sel.style.color = "red";
+  else if (v.startsWith("G")) sel.style.color = "green";
+  else sel.style.color = "black";
+}
+document.querySelectorAll("select.dc-select").forEach(sel => {
+  sel.addEventListener("change", () => updateDCcolor(sel));
+  updateDCcolor(sel); // initial
 });
 </script>
+
+
+
+
+
+
+
+
+
+
+<script>
+function formatToNearestQuarter(value) {
+  let num = parseFloat(value);
+  if (isNaN(num)) return "+0.00";
+  // round to nearest 0.25
+  let rounded = Math.round(num / 0.25) * 0.25;
+  return (rounded >= 0 ? "+" : "") + rounded.toFixed(2);
+}
+
+function formatAxis(value) {
+  let num = parseInt(value, 10);
+  if (isNaN(num)) return "180";
+  if (num <= 0) return "180";
+  if (num > 180) return "180";
+  return String(num);
+}
+
+function attachNoteHandlers() {
+  const ids = [
+    // --- OD / OS ---
+    "dc-sph-od-notes", "c2_od_notes", "a2_od_notes",
+    "dc-sph-os-notes", "c2_os_notes", "a2_os_notes",
+
+
+    // --- OU (regular) ---
+    "dc-sph-ou-notes", "c2_ou_notes", "a2_ou_notes",
+    "dc-sph-od-notes", "c2_od_notes", "a2_od_notes",
+    "dc-sph-os-notes", "c2_os_notes", "a2_os_notes",
+    
+
+
+    // --- OU (manual) ---
+    "dc-sph-ou-manual-notes", "c2_ou_manual_notes", "a2_ou_manual_notes","add-ou",
+    "dc-sph-od-manual-notes", "c2_od_manual_notes", "a2_od_manual_notes","add-od",
+    "dc-sph-os-manual-notes", "c2_os_manual_notes", "a2_os_manual_notes","add-os",
+
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("blur", () => {
+      let val = el.value.trim();
+
+      if (id.includes("axis") || id.includes("a2_")) {
+        // Axis formatting
+        el.value = formatAxis(val);
+      } else {
+        // Sphere / Cylinder formatting
+        el.value = formatToNearestQuarter(val);
+      }
+    });
+  });
+}
+
+// Run after DOM is ready
+document.addEventListener("DOMContentLoaded", attachNoteHandlers);
+</script>
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-target');
+    document.querySelectorAll(`.${target}`).forEach(el => {
+      el.style.display = (el.style.display === '' || el.style.display === 'none') ? 'table-row-group' : 'none';
+    });
+  });
+});
+</script>
+
+<script>
+function makeToggle(spanId, hideClass) {
+  const span = document.getElementById(spanId);
+  let testDone = false; // initial state
+
+  span.addEventListener("click", () => {
+    testDone = !testDone; // toggle state
+
+    if (testDone) {
+      span.textContent = "● ✅ Selected";
+      span.style.fontWeight = "bold";
+
+      if (hideClass) {
+        document.querySelectorAll("." + hideClass).forEach(el => {
+          el.style.display = "inline";
+        });
+      }
+    } else {
+      span.textContent = "● ❌ Unselected";
+      span.style.fontWeight = "bold";
+
+      if (hideClass) {
+        document.querySelectorAll("." + hideClass).forEach(el => {
+          el.style.display = "none";
+        });
+      }
+    }
+  });
+}
+
+// usage examples
+makeToggle("testToggle1", "testStatus"); // this one toggles other spans
+makeToggle("testToggle2");               // standalone
+makeToggle("testToggle3");               // standalone
+
+</script>
+
+
+<script>
+document.getElementById("toggleAdjustments2").addEventListener("click", function() {
+  document.querySelectorAll(".adj2").forEach(row => {
+    row.style.display = (row.style.display === "none" || row.style.display === "") 
+      ? "table-row" 
+      : "none";
+  });
+});
+</script>
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Shared state for all mirrors
+  let testDone = false;
+
+  // Function to update all mirrors
+  function updateTestStatusMirrors() {
+    document.querySelectorAll(".testStatus").forEach(el => {
+      el.textContent = testDone ? "Test done" : "Test ongoing..";
+      el.style.color = testDone ? "black" : "black";
+    });
+  }
+
+  // Attach click listener to all current and future mirrors
+  function attachMirrorListeners() {
+    document.querySelectorAll(".testStatus").forEach(el => {
+      if(!el.dataset.listenerAttached){
+        el.addEventListener("click", () => {
+          testDone = !testDone;
+          updateTestStatusMirrors();
+        });
+        el.dataset.listenerAttached = "true";
+      }
+    });
+  }
+
+  // Initial setup
+  attachMirrorListeners();
+  updateTestStatusMirrors();
+
+  // Optional: observe DOM changes to attach listeners to newly added mirrors
+  const observer = new MutationObserver(() => {
+    attachMirrorListeners();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  let testDone = false; // existing shared state
+
+  function updateMirrors() {
+    document.querySelectorAll(".testStatus").forEach(el => {
+      if (testDone) {
+        el.textContent = "● RX Finalized";
+        el.style.textDecoration = "none";  
+        el.style.fontStyle = "normal";          
+        el.style.fontWeight = "bold";
+      } else {
+        el.textContent = "● RX Not Final";
+        el.style.textDecoration = "none";       
+        el.style.fontWeight = "normal";
+      }
+    });
+
+
+  // Mirror click behavior: toggle
+  document.querySelectorAll(".testStatus").forEach(el => {
+    el.addEventListener("click", () => {
+      testDone = !testDone;
+      updateMirrors();
+    });
+  });
+
+  // Reset mirrors whenever a calculator input changes
+  const inputIds = [
+    "s1_od","c1_od","a1_od",
+    "s1_os","c1_os","a1_os",
+    "dc-sph-od","c2_od","a2_od",
+    "dc-sph-os","c2_os","a2_os",
+    "dc-sph-ou","c2_ou","a2_ou"
+  ];
+
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener("input", () => {
+      testDone = false;
+      updateMirrors();
+    });
+  });
+
+
+
+  // Reset mirrors on adjustment buttons
+  const adjustmentButtons = document.querySelectorAll(".addMinus025, .sph-btn, .sph-btn-mono");
+  adjustmentButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      testDone = false;
+      updateMirrors();
+    });
+  });
+
+  updateMirrors(); // initialize
+});
+</script>
+
+
+
+
+<script>
+
+window.extraMinus025 = window.extraMinus025 ?? false;
+
+document.addEventListener("DOMContentLoaded", () => {
+
+// ---------- Toggle for extra -0.25 @ 180 (mirror buttons) ----------
+
+// helper to update all mirror buttons' label + color so they stay in sync
+function updateMinus025Buttons() {
+  document.querySelectorAll('.addMinus025').forEach(b => {
+    b.style.color = extraMinus025 ? 'red' : 'black';
+    b.textContent = extraMinus025 ? '● Horizon Enhance' : '● All Angles Even';
+  });
+}
+
+// attach listener to every mirror button
+document.querySelectorAll('.addMinus025').forEach(btn => {
+  btn.addEventListener('click', () => {
+    window.extraMinus025 = !window.extraMinus025;
+    updateMinus025Buttons();
+    combineAll();
+updateAnalysisOuCylAx();
+  });
+});
+
+// set initial text/color
+updateMinus025Buttons();
+
+// ---------- Helpers ----------
+function combineEyeWithout025(S_now, C_now, A_now, DC_S, C2, A2){
+  const savedExtra = window.extraMinus025; // 🔴 read GLOBAL
+  window.extraMinus025 = false;            // 🔴 temporarily disable globally
+  const result = combineEyeWithDeficit(S_now, C_now, A_now, DC_S, C2, A2);
+  window.extraMinus025 = savedExtra;       // 🔴 restore
+  return result;
+}
+
+  // ---------- Helpers ----------
+  function safeParseFloat(v){
+    if(v === null || v === undefined) return 0;
+    if(typeof v === "number") return Number.isFinite(v) ? v : 0;
+    v = String(v).trim();
+    if(v === "" || v === "—" || v === "–") return 0;
+    v = v.replace(',', '.');
+    const n = parseFloat(v);
+    if(!Number.isNaN(n)) return n;
+    const m = v.match(/[+-]?(?:\d+\.?\d*|\.\d+)/);
+    return m ? parseFloat(m[0]) : 0;
+  }
+
+  function roundQuarterNumber(n){ return Math.round(safeParseFloat(n) * 4) / 4; }
+  function formatValueForDisplay(n){ const val = roundQuarterNumber(n); return (val >= 0 ? "+" : "") + val.toFixed(2); }
+
+  function calcSENumber(S, C){ S = safeParseFloat(S); C = safeParseFloat(C); return S + C/2; }
+  function formatSEforDisplay(n){ return (n >= 0 ? "+" : "") + n.toFixed(2); }
+
+  function formatSEDiffForDisplay(n){
+    const num = safeParseFloat(n);
+    if (isNaN(num)) return "—";
+    return (num >= 0 ? "+" : "") + num.toFixed(2);
+  }
+
+  function deg2rad(d){ return d * Math.PI / 180; }
+  function rad2deg(r){ return r * 180 / Math.PI; }
+
+  function toMinusCyl({S, C, A}) {
+    S = safeParseFloat(S); C = safeParseFloat(C); A = Math.round(safeParseFloat(A) || 0);
+    if (C > 0) { S = S + C; C = -C; A = (A + 90) % 180; }
+    A = ((A % 180) + 180) % 180;
+    return { S, C, A };
+  }
+
+  function setIf(id, val){
+    const el = document.getElementById(id);
+    if(el) el.textContent = val;
+  }
+
+  function dcStatusText(val){
+    let v = roundQuarterNumber(val);
+    if(v === 0) return { text: "BAL", color: "black" };
+    const absVal = Math.abs(v);
+    const level = Math.max(Math.round(absVal / 0.25), 1);
+    if(v > 0) return { text: `G${level} Over -${absVal.toFixed(2)}`, color: "green" };
+    return { text: `R${level} Under -${absVal.toFixed(2)}`, color: "red" };
+  }
+
+  function updateDCSummaryForEye(dcInputId, dcDisplayId, nowDCId){
+    const inputEl = document.getElementById(dcInputId);
+    const displayEl = document.getElementById(dcDisplayId);
+    const nowDCEl = document.getElementById(nowDCId);
+    if(!inputEl) return;
+    const val = safeParseFloat(inputEl.value);
+    const info = dcStatusText(val);
+    if(displayEl){ displayEl.textContent = info.text; displayEl.style.color = info.color; }
+    if(nowDCEl){ nowDCEl.textContent = info.text.split(' ')[0]; nowDCEl.style.color = info.color; }
+  }
+
+  // ---------- Core vector combine function ----------
+  // Combines NowRx (S1,C1,A1) with fan-chart cylinder (C2,A2) and DC sphere (DC_S)
+  function combineEyeWithDeficit(S_now, C_now, A_now, DC_S, C2, A2){
+    const rx1 = toMinusCyl({ S: S_now, C: C_now, A: A_now });
+    const S2_from_FC = -safeParseFloat(C2) / 2;
+    const rx2 = toMinusCyl({ S: S2_from_FC, C: C2, A: A2 });
+
+    const M1 = rx1.S + rx1.C / 2;
+    const J01 = -rx1.C/2 * Math.cos(2 * deg2rad(rx1.A));
+    const J451 = -rx1.C/2 * Math.sin(2 * deg2rad(rx1.A));
+
+    const M2 = rx2.S + rx2.C / 2;
+    const J02 = -rx2.C/2 * Math.cos(2 * deg2rad(rx2.A));
+    const J452 = -rx2.C/2 * Math.sin(2 * deg2rad(rx2.A));
+
+    let M_total = M1 + M2 + safeParseFloat(DC_S);
+    let J0_total = J01 + J02;
+    let J45_total = J451 + J452;
+
+    if (extraMinus025) {
+    // Add cyl-only vector for -0.25 × 180 (J0 = +0.25)
+    M_total -= 0.0625;
+    J0_total += 0.125;
+    }
+    
+    
+
+    const C_total_raw = -2 * Math.sqrt(J0_total * J0_total + J45_total * J45_total);
+    const S_total_raw = M_total - C_total_raw / 2;
+    let A_total = 0.5 * rad2deg(Math.atan2(J45_total, J0_total));
+    if(A_total < 0) A_total += 180;
+    A_total = Math.round(A_total); // axis to nearest 1 degree
+
+    const S_total_q = roundQuarterNumber(S_total_raw);
+    const C_total_q = roundQuarterNumber(C_total_raw);
+
+    const SE_numeric = S_total_q + C_total_q / 2;
+
+    return { S: S_total_q, C: C_total_q, A: A_total, SE: SE_numeric };
+  }
+
+  // ---------- Main combine function (updates OU + Mono + SE diffs + DC summaries) ----------
+  function combineAll(){
+    try {
+
+
+      // --- Read Now Rx ---
+      const S_RE = safeParseFloat(document.getElementById("s1_od")?.value || 0);
+      const C_RE = safeParseFloat(document.getElementById("c1_od")?.value || 0);
+      const A_RE = Math.round(safeParseFloat(document.getElementById("a1_od")?.value || 0));
+
+      const S_LE = safeParseFloat(document.getElementById("s1_os")?.value || 0);
+      const C_LE = safeParseFloat(document.getElementById("c1_os")?.value || 0);
+      const A_LE = Math.round(safeParseFloat(document.getElementById("a1_os")?.value || 0));
+
+      // write Now SE (numeric) into any existing now-se ids
+      const nowSE_RE_num = calcSENumber(S_RE, C_RE);
+      const nowSE_LE_num = calcSENumber(S_LE, C_LE);
+      setIf("now-se-od", formatSEforDisplay(nowSE_RE_num));
+      setIf("now-se-os", formatSEforDisplay(nowSE_LE_num));
+      setIf("now-se-od-2", formatSEforDisplay(nowSE_RE_num));
+      setIf("now-se-os-2", formatSEforDisplay(nowSE_LE_num));
+
+      // baseline now diff (RE - LE) — high sensitivity (0.01)
+      const nowDiff = nowSE_RE_num - nowSE_LE_num;
+      setIf("now-se-diff", formatSEDiffForDisplay(nowDiff));
+      setIf("now-se-diff-od", formatSEDiffForDisplay(nowDiff));
+      setIf("now-se-diff-os", formatSEDiffForDisplay(nowDiff));
+
+      // --- Read Deficit OU ---
+      const DC_OU = safeParseFloat(document.getElementById("dc-sph-ou")?.value || 0);
+      const C2_OU = safeParseFloat(document.getElementById("c2_ou")?.value || 0);
+      const A2_OU = Math.round(safeParseFloat(document.getElementById("a2_ou")?.value || 0));
+
+      // OU combine for each eye (Now Rx + OU deficit vectorially)
+      const RE_ou = combineEyeWithDeficit(S_RE, C_RE, A_RE, DC_OU, C2_OU, A2_OU);
+      const LE_ou = combineEyeWithDeficit(S_LE, C_LE, A_LE, DC_OU, C2_OU, A2_OU);
+
+      // write OU result fields
+      setIf("res-sph-ou-re", formatValueForDisplay(RE_ou.S));
+      setIf("res-cyl-ou-re", formatValueForDisplay(RE_ou.C));
+const axisRE_OU = (Math.abs(RE_ou.C) < 0.001) ? "—" : (RE_ou.A === 0 ? "180" : String(RE_ou.A));
+setIf("res-axis-ou-re", axisRE_OU);
+setIf("res-se-ou-re", formatSEforDisplay(RE_ou.SE));
+
+      setIf("res-sph-ou-le", formatValueForDisplay(LE_ou.S));
+      setIf("res-cyl-ou-le", formatValueForDisplay(LE_ou.C));
+const axisLE_OU = (Math.abs(LE_ou.C) < 0.001) ? "—" : (LE_ou.A === 0 ? "180" : String(LE_ou.A));
+setIf("res-axis-ou-le", axisLE_OU);
+setIf("res-se-ou-le", formatSEforDisplay(LE_ou.SE));
+
+
+
+
+
+
+
+
+
+// --- Glasses vs Contact Lens Conversion ---
+const currentWear = document.querySelector('input[name="current-wearType"]:checked')?.value; // "glasses" or "contacts"
+const targetWear  = document.querySelector('input[name="wearType"]:checked')?.value;         // "glasses" or "contacts"
+
+// Conversion helpers (same as your working formula)
+function glassesToCL(power) {
+  const d = 0.01; // 10 mm vertex distance
+  const F = parseFloat(power) || 0;
+  return F / (1 - d * F);
+}
+function clToGlasses(power) {
+  const d = 0.012;
+  const F = parseFloat(power) || 0;
+  return F / (1 + d * F);
+}
+
+// Apply conversion only if current and target differ
+if (currentWear && targetWear && currentWear !== targetWear) {
+  const toCL = currentWear === "glasses" && targetWear === "contacts";
+
+  // --- SPHERE conversion (your original logic) ---
+  ["res-sph-ou-re", "res-sph-ou-le"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const sph = parseFloat(el.textContent) || 0;
+
+    const newSph = toCL ? glassesToCL(sph) : clToGlasses(sph);
+    el.textContent = formatValueForDisplay(newSph);
+  });
+
+  // --- CYLINDER + AXIS conversion (now observes res-cyl-ou-*) ---
+  ["re", "le"].forEach(side => {
+    const sphEl  = document.getElementById(`res-sph-ou-${side}`);
+    const cylEl  = document.getElementById(`res-cyl-ou-${side}`);
+    const axisEl = document.getElementById(`res-axis-ou-${side}`);
+
+    if (!sphEl || !cylEl) return;
+
+    const sVal   = parseFloat(sphEl.textContent)  || 0;
+    const cVal   = parseFloat(cylEl.textContent)  || 0;
+    const axisVal = parseFloat(axisEl?.textContent) || 0;
+
+    // total (stronger) meridian
+    const total = sVal + cVal;
+
+    // apply same formula depending on direction
+    const convSphere = toCL ? glassesToCL(sVal) : clToGlasses(sVal);
+    const convTotal  = toCL ? glassesToCL(total) : clToGlasses(total);
+
+    // new cyl = difference between converted meridians
+    const newCyl = convTotal - convSphere;
+
+    // update display
+    cylEl.textContent  = formatValueForDisplay(newCyl);
+    axisEl.textContent = axisVal;
+  });
+}
+
+// --- Auto update when radio changes ---
+document.querySelectorAll('input[name="current-wearType"], input[name="wearType"]').forEach(radio => {
+  radio.addEventListener("change", combineAll);
+});
+
+
+
+
+
+
+
+
+// persist OU baseline sph so SPH buttons always reference the true base
+const elResSphOuRe = document.getElementById("res-sph-ou-re");
+if (elResSphOuRe) elResSphOuRe.dataset.base = String(RE_ou.S);
+const elResSphOuLe = document.getElementById("res-sph-ou-le");
+if (elResSphOuLe) elResSphOuLe.dataset.base = String(LE_ou.S);
+
+
+      // OU SE diff — high sensitivity (0.01)
+      const ouDiff = RE_ou.SE - LE_ou.SE;
+      setIf("res-se-diff-ou", formatSEDiffForDisplay(ouDiff));
+      setIf("res-se-diff-ou-re", formatSEDiffForDisplay(ouDiff));
+      setIf("res-se-diff-ou-le", formatSEDiffForDisplay(ouDiff));
+
+      // --- Mono combines (per-eye deficits) ---
+      const DC_RE = safeParseFloat(document.getElementById("dc-sph-od")?.value || 0);
+      const C2_RE = safeParseFloat(document.getElementById("c2_od")?.value || 0);
+      const A2_RE = Math.round(safeParseFloat(document.getElementById("a2_od")?.value || 0));
+
+      const DC_LE = safeParseFloat(document.getElementById("dc-sph-os")?.value || 0);
+      const C2_LE = safeParseFloat(document.getElementById("c2_os")?.value || 0);
+      const A2_LE = Math.round(safeParseFloat(document.getElementById("a2_os")?.value || 0));
+
+      const RE_mono = combineEyeWithDeficit(S_RE, C_RE, A_RE, DC_RE, C2_RE, A2_RE);
+      const LE_mono = combineEyeWithDeficit(S_LE, C_LE, A_LE, DC_LE, C2_LE, A2_LE);
+
+      // write Mono result fields
+      setIf("res-sph-od-2", formatValueForDisplay(RE_mono.S));
+      setIf("res-cyl-od-2", formatValueForDisplay(RE_mono.C));
+const axisOD_MONO = (Math.abs(RE_mono.C) < 0.001) ? "—" : (RE_mono.A === 0 ? "180" : String(RE_mono.A));
+setIf("res-axis-od-2", axisOD_MONO);
+setIf("res-se-od-2", formatSEforDisplay(RE_mono.SE));
+
+      setIf("res-sph-os-2", formatValueForDisplay(LE_mono.S));
+      setIf("res-cyl-os-2", formatValueForDisplay(LE_mono.C));
+const axisOS_MONO = (Math.abs(LE_mono.C) < 0.001) ? "—" : (LE_mono.A === 0 ? "180" : String(LE_mono.A));
+setIf("res-axis-os-2", axisOS_MONO);
+setIf("res-se-os-2", formatSEforDisplay(LE_mono.SE));
+
+// persist Mono baseline sph
+const elResSphOd2 = document.getElementById("res-sph-od-2");
+if (elResSphOd2) elResSphOd2.dataset.base = String(RE_mono.S);
+const elResSphOs2 = document.getElementById("res-sph-os-2");
+if (elResSphOs2) elResSphOs2.dataset.base = String(LE_mono.S);
+
+      // Mono SE diff — high sensitivity (0.01)
+      const monoDiff = RE_mono.SE - LE_mono.SE;
+      setIf("res-se-diff-2", formatSEDiffForDisplay(monoDiff));
+      setIf("res-se-diff-od-2", formatSEDiffForDisplay(monoDiff));
+      setIf("res-se-diff-os-2", formatSEDiffForDisplay(monoDiff));
+
+// ---------- Final OU (no -0.25) ----------
+const final_RE_ou = combineEyeWithout025(S_RE, C_RE, A_RE, DC_OU, C2_OU, A2_OU);
+const final_LE_ou = combineEyeWithout025(S_LE, C_LE, A_LE, DC_OU, C2_OU, A2_OU);
+
+setIf("final-sph-ou-re", formatValueForDisplay(final_RE_ou.S));
+setIf("final-cyl-ou-re", formatValueForDisplay(final_RE_ou.C));
+setIf("final-axis-ou-re", (Math.abs(final_RE_ou.C)<0.001)?"—":(final_RE_ou.A===0?"180":final_RE_ou.A));
+setIf("final-se-ou-re", formatSEforDisplay(final_RE_ou.SE));
+setIf("final-dc-ou-re","BAL");
+
+setIf("final-sph-ou-le", formatValueForDisplay(final_LE_ou.S));
+setIf("final-cyl-ou-le", formatValueForDisplay(final_LE_ou.C));
+setIf("final-axis-ou-le", (Math.abs(final_LE_ou.C)<0.001)?"—":(final_LE_ou.A===0?"180":final_LE_ou.A));
+setIf("final-se-ou-le", formatSEforDisplay(final_LE_ou.SE));
+setIf("final-dc-ou-le","BAL");
+
+// ---------- Final Mono (no -0.25) ----------
+const final_RE_mono = combineEyeWithout025(S_RE, C_RE, A_RE, DC_RE, C2_RE, A2_RE);
+const final_LE_mono = combineEyeWithout025(S_LE, C_LE, A_LE, DC_LE, C2_LE, A2_LE);
+
+setIf("final-sph-od", formatValueForDisplay(final_RE_mono.S));
+setIf("final-cyl-od", formatValueForDisplay(final_RE_mono.C));
+setIf("final-axis-od", (Math.abs(final_RE_mono.C)<0.001)?"—":(final_RE_mono.A===0?"180":final_RE_mono.A));
+setIf("final-se-od", formatSEforDisplay(final_RE_mono.SE));
+setIf("final-dc-od","BAL");
+
+setIf("final-sph-os", formatValueForDisplay(final_LE_mono.S));
+setIf("final-cyl-os", formatValueForDisplay(final_LE_mono.C));
+setIf("final-axis-os", (Math.abs(final_LE_mono.C)<0.001)?"—":(final_LE_mono.A===0?"180":final_LE_mono.A));
+setIf("final-se-os", formatSEforDisplay(final_LE_mono.SE));
+setIf("final-dc-os","BAL");
+
+
+
+// --- Bypass calculation (rounded to nearest 0.25 D) ---
+// Mono (OD/OS)
+const bypassRE = safeParseFloat(document.getElementById("res-se-od-2")?.textContent);
+const bypassLE = safeParseFloat(document.getElementById("res-se-os-2")?.textContent);
+
+if (!Number.isNaN(bypassRE) && !Number.isNaN(bypassLE)) {
+  let bypassDiff = bypassRE - bypassLE;
+  bypassDiff = Math.round(bypassDiff * 8) / 8; // round to nearest 0.125 D
+  setIf("bypass", formatSEDiffForDisplay(bypassDiff));
+}
+
+// Final Mono (OD/OS)
+const finalMonoRE = safeParseFloat(document.getElementById("final-se-od")?.textContent);
+const finalMonoLE = safeParseFloat(document.getElementById("final-se-os")?.textContent);
+
+if (!Number.isNaN(finalMonoRE) && !Number.isNaN(finalMonoLE)) {
+  let bypassDiffMono = finalMonoRE - finalMonoLE;
+  bypassDiffMono = Math.round(bypassDiffMono * 8) / 8; // nearest 0.125 D
+  setIf("bypass-final-mono", formatSEDiffForDisplay(bypassDiffMono));
+}
+
+// Final OU (RE/LE)
+const finalOuRE = safeParseFloat(document.getElementById("final-se-ou-re")?.textContent);
+const finalOuLE = safeParseFloat(document.getElementById("final-se-ou-le")?.textContent);
+
+if (!Number.isNaN(finalOuRE) && !Number.isNaN(finalOuLE)) {
+  let bypassDiffOu = finalOuRE - finalOuLE;
+  bypassDiffOu = Math.round(bypassDiffOu * 8) / 8; // nearest 0.125 D
+  setIf("bypass-final-ou", formatSEDiffForDisplay(bypassDiffOu));
+}
+
+
+
+// Track offsets in 0.25 steps for OU and Mono
+const sphOffsets = { ou: 0, mono: 0 };
+
+document.querySelectorAll('.sph-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.group;   // "ou" or "mono"
+    const step = parseFloat(btn.dataset.step); // -0.25 or +0.25
+
+    // Update offset
+    sphOffsets[group] += step;
+
+    // Reapply adjustment
+    applySphOffset(group);
+  });
+});
+
+
+// Call this after your main OU/Mono results are calculated
+function applySphOffset(group) {
+  const ids = (group === "ou")
+    ? { right: "res-sph-ou-re", left: "res-sph-ou-le", dcr: "res-dc-ou-re", dcl: "res-dc-ou-le" }
+    : { right: "res-sph-od-2", left: "res-sph-os-2", dcr: "res-dc-od-2", dcl: "res-dc-os-2" };
+
+  const rightCell = document.getElementById(ids.right);
+  const leftCell  = document.getElementById(ids.left);
+  const dcRight   = document.getElementById(ids.dcr);
+  const dcLeft    = document.getElementById(ids.dcl);
+
+  if (!rightCell || !leftCell) return;
+
+  // Preserve the original base (only set once)
+  if (!rightCell.dataset.base) rightCell.dataset.base = rightCell.textContent.trim() || "0";
+  if (!leftCell.dataset.base)  leftCell.dataset.base  = leftCell.textContent.trim() || "0";
+
+  const baseRight = parseFloat(rightCell.dataset.base) || 0;
+  const baseLeft  = parseFloat(leftCell.dataset.base) || 0;
+
+// Formatter: always show + for positives
+function formatSigned(value) {
+  const num = parseFloat(value).toFixed(2);
+  if (num > 0) return "+" + num;
+  return num; // negatives already have -, zero stays 0.00
+}
+
+// Apply offset math (fixed so it doesn’t jump)
+const newRight = baseRight + sphOffsets[group];
+const newLeft  = baseLeft + sphOffsets[group];
+
+rightCell.textContent = formatSigned(newRight);
+leftCell.textContent  = formatSigned(newLeft);
+
+
+  // Update DC label + color
+  const label = getDcLabel(sphOffsets[group]);
+  if (dcRight) {
+    dcRight.textContent = label.text;
+    dcRight.style.color = label.color;
+    dcRight.style.fontWeight = "none";
+  }
+  if (dcLeft) {
+    dcLeft.textContent = label.text;
+    dcLeft.style.color = label.color;
+    dcLeft.style.fontWeight = "none";
+  }
+}
+
+function getDcLabel(offset) {
+  if (offset === 0) return { text: "BAL", color: "black" };
+  if (offset < 0) return { text: "G" + Math.abs(offset / 0.25), color: "green" };
+  return { text: "R" + (offset / 0.25), color: "red" };
+}
+
+
+      // --- Update DC summary for eyes (ensure OU updates dc-ou) ---
+      updateDCSummaryForEye("dc-sph-od", "dc-summary", "now-dc-od");
+      updateDCSummaryForEye("dc-sph-os", "dc-summary", "now-dc-os");
+      updateDCSummaryForEye("dc-sph-ou", "dc-summary", "dc-ou");
+
+// --- RESET PRESCRIBED DC STATUS TO BAL ---
+const prescribedDCEyes = [
+  "res-dc-ou-re", "res-dc-ou-le",
+  "res-dc-od-2", "res-dc-os-2"
+];
+
+prescribedDCEyes.forEach(id => {
+  const el = document.getElementById(id);
+  if(el) {
+    el.textContent = "BAL";
+    el.style.color = "black";
+    el.style.fontWeight = "none";
+  }
+});
+
+
+
+
+    } catch (err) {
+      console.error("combineAll error:", err);
+    }
+  }
+
+  // ---------- formatting on blur / axis handling ----------
+  function isAxisId(id){
+    if(!id) return false;
+    return id.startsWith("a");
+  }
+
+  function autoFormatInput(el){
+    if(!el) return;
+    const id = el.id || "";
+    let raw = String(el.value || "").trim();
+    if(raw === "") return;
+    if(isAxisId(id)){
+      let num = parseInt(raw, 10);
+      if(Number.isNaN(num)) num = 0;
+      num = Math.max(0, Math.min(180, num));
+      el.value = String(num);
+    } else {
+      let n = roundQuarterNumber(raw);
+      el.value = (n >= 0 ? "+" : "") + n.toFixed(2);
+    }
+  }
+
+  // ---------- Attach listeners ----------
+  const inputIds = [
+    "s1_od","c1_od","a1_od",
+    "s1_os","c1_os","a1_os",
+    "dc-sph-od","c2_od","a2_od",
+    "dc-sph-os","c2_os","a2_os",
+    "dc-sph-ou","c2_ou","a2_ou",
+    "near-dc-sph-ou","inter-dc-sph-ou"
+
+  ];
+
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    // live update as you type
+    el.addEventListener("input", combineAll);
+    // format on blur/enter
+    el.addEventListener("blur", (e) => { autoFormatInput(e.target); combineAll(); });
+    el.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){ e.preventDefault(); autoFormatInput(e.target); combineAll(); }
+    });
+  });
+
+  // Also ensure duochrome inputs update summary live
+  ["dc-sph-od","dc-sph-os","dc-sph-ou"].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", () => {
+      updateDCSummaryForEye("dc-sph-od","dc-summary","now-dc-od");
+      updateDCSummaryForEye("dc-sph-os","dc-summary","now-dc-os");
+      updateDCSummaryForEye("dc-sph-ou","dc-summary","dc-ou");
+    });
+  });
+
+  // initial run
+  combineAll();
+});
+
+</script>
+
+<script>
+// ---------------- Monocular Adjustments (per eye, live adjust) ----------------
+
+// Attach listeners to monocular sph adjustment buttons
+document.querySelectorAll('.sph-btn-mono').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const eye = btn.dataset.eye;        // "od" or "os"
+    const step = parseFloat(btn.dataset.step); // -0.25 or +0.25
+    applySphOffsetMonoLive(eye, step);
+  });
+});
+
+function applySphOffsetMonoLive(eye, step) {
+  const ids = (eye === "od")
+    ? { sph: "res-sph-od-2", dc: "res-dc-od-2" }
+    : { sph: "res-sph-os-2", dc: "res-dc-os-2" };
+
+  const sphCell = document.getElementById(ids.sph);
+  const dcCell  = document.getElementById(ids.dc);
+  if (!sphCell || !dcCell) return;
+
+  // --- Adjust SPH directly from what's currently shown ---
+  const currentVal = parseFloat(sphCell.textContent) || 0;
+  const newVal = currentVal + step;
+  sphCell.textContent = formatSigned(newVal);
+
+  // --- Adjust DC purely by observing current label and nudging by 1 step ---
+  const currentLabel = (dcCell.textContent || "").trim();
+  const newLabel = getNextDcLabelByNudge(currentLabel, step);
+  dcCell.textContent = newLabel.text;
+  dcCell.style.color = newLabel.color;
+  dcCell.style.fontWeight = "none";
+}
+
+// Format numbers with sign
+function formatSigned(value) {
+  // ensure standard +/− two-decimal format
+  const num = Number(value);
+  if (Number.isNaN(num)) return "+0.00";
+  const s = num.toFixed(2);
+  return (num >= 0 ? "+" : "") + s;
+}
+
+// Parse DC string into a numeric offset: BAL -> 0, Rn -> +n, Gn -> -n
+function parseDcToNumber(current) {
+  const s = String(current || "").toUpperCase().trim();
+  if (s === "BAL") return 0;
+
+  // find first R or G and the following number (e.g. "R2", "G10", or "R 1")
+  const m = s.match(/([RG])\s*([-]?\d+)/i);
+  if (!m) return 0;
+
+  const dir = m[1].toUpperCase();
+  const num = parseInt(m[2], 10) || 0;
+  return dir === "R" ? num : -num;
+}
+
+// Convert numeric offset back to label object
+function numberToDcLabel(n) {
+  if (!n) return { text: "BAL", color: "black" };
+  if (n > 0) return { text: "R" + n, color: "red" };
+  return { text: "G" + Math.abs(n), color: "green" };
+}
+
+// Nudge the DC label by one step in the direction of `step`
+// (step > 0 increments numeric by +1; step < 0 decrements numeric by 1)
+function getNextDcLabelByNudge(current, step) {
+  const n = parseDcToNumber(current);
+  const delta = (step > 0) ? 1 : -1;
+  const next = n + delta;
+
+  return numberToDcLabel(next);
+}
+</script>
+
+<script>
+function updateSEDiffLive() {
+  const seOD = parseFloat(document.getElementById("res-se-od-2")?.textContent) || 0;
+  const seOS = parseFloat(document.getElementById("res-se-os-2")?.textContent) || 0;
+  const diff = seOD - seOS;
+
+  // Update all relevant SE diff displays
+  ["res-se-diff-2", "res-se-diff-od-2", "res-se-diff-os-2"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = formatSEDiffForDisplay(diff);
+  });
+}
+
+// Patch your existing monocular SPH adjustment function
+function applySphOffsetMonoLive(eye, step) {
+  const ids = (eye === "od")
+    ? { sph: "res-sph-od-2", dc: "res-dc-od-2" }
+    : { sph: "res-sph-os-2", dc: "res-dc-os-2" };
+
+  const sphCell = document.getElementById(ids.sph);
+  const dcCell  = document.getElementById(ids.dc);
+  if (!sphCell || !dcCell) return;
+
+  const currentVal = parseFloat(sphCell.textContent) || 0;
+  const newVal = currentVal + step;
+  sphCell.textContent = formatSigned(newVal);
+
+  const currentLabel = (dcCell.textContent || "").trim();
+  const newLabel = getNextDcLabelByNudge(currentLabel, step);
+  dcCell.textContent = newLabel.text;
+  dcCell.style.color = newLabel.color;
+  dcCell.style.fontWeight = "none";
+
+  // --- NEW: update SE DIFF live ---
+  updateSEDiffLive();
+}
+
+// Optional: if you also allow typing directly in the SPH input, attach a listener
+document.querySelectorAll("#res-sph-od-2, #res-sph-os-2").forEach(el => {
+  el.addEventListener("input", updateSEDiffLive);
+});
+</script>
+
+<script>
+function updateBypass(eye, step) {
+    const bypassCell = document.getElementById('bypass');
+    if (!bypassCell) return;
+
+    // Get current value
+    let current = parseFloat(bypassCell.textContent) || 0;
+
+    // Determine the change based on eye and step
+    let delta = 0;
+    if (eye === 'od') delta = step;   // Right eye: normal
+    if (eye === 'os') delta = -step;  // Left eye: reverse
+
+    const newVal = current + delta;
+    bypassCell.textContent = (newVal >= 0 ? "+" : "") + newVal.toFixed(2);
+}
+
+// Attach observer to the existing monocular buttons
+document.querySelectorAll('.sph-btn-mono').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const eye = btn.dataset.eye;        
+        const step = parseFloat(btn.dataset.step); 
+        updateBypass(eye, step);
+    });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(() => {
+  // isolated namespace
+  const _ID = '__dcAdvice_isolated_v1';
+
+  // small helper: robustly convert a label like "G2", "G 2", "R1", "BAL", or "G1 Over -0.25" into step integer
+  // returns: 0 for BAL, positive integer for R (e.g. R2 -> 2), negative integer for G (G2 -> -2)
+  function _labelToStep(raw) {
+    if (!raw) return 0;
+    const s = String(raw).trim().toUpperCase();
+    if (s === 'BAL' || s === '—' || s === '—' ) return 0;
+
+    // look for first occurrence of G or R followed by a number
+    const m = s.match(/([GR])\s*([+-]?\d+)/i);
+    if (m) {
+      const dir = m[1].toUpperCase();
+      const n = Math.abs(parseInt(m[2], 10) || 0);
+      return dir === 'G' ? -n : n;
+    }
+
+    // fallback: if contains 'G' but no number, treat as G1; same for R
+    if (/G\b/.test(s)) return -1;
+    if (/R\b/.test(s)) return 1;
+    return 0;
+  }
+
+// just return numbers as string
+function _numToWord(n) {
+  return String(n);
+}
+
+
+  // build the advice HTML exactly as requested
+  function _buildAdviceHtml(diffSteps) {
+    // diffSteps = targetStep - resultStep
+    if (diffSteps === 0) return 'DC Matched.';
+
+    const presses = Math.min(Math.abs(diffSteps), 99); // cap for safeness
+    const word = _numToWord(presses);
+    const plural = (presses === 1) ? 'time' : 'times';
+
+    if (diffSteps < 0) {
+      // need MORE minus -> press S-0.25 (red)
+      return `Click <span style="color:green;">S-0.25</span> ${word} ${plural} balance DC.`;
+    } else {
+      // need MORE plus -> press S+0.25 (green)
+      return `Click <span style="color:red;">S+0.25</span> ${word} ${plural} match DC.`;
+    }
+  }
+
+  // main update function (safe, idempotent)
+  function _updateAdvice() {
+    try {
+      const elTarget = document.getElementById('dc-ou');
+      const elResult = document.getElementById('res-dc-ou-re');
+      const elAdvice = document.getElementById('dc-advice');
+      if (!elAdvice) return; // nothing to update
+
+      // read texts (use textContent to avoid layout reflow issues)
+      const targetText = elTarget ? elTarget.textContent.trim() : '';
+      const resultText = elResult ? elResult.textContent.trim() : '';
+
+      const targetStep = _labelToStep(targetText);
+      const resultStep = _labelToStep(resultText);
+
+      const diffSteps = targetStep - resultStep;
+      elAdvice.innerHTML = _buildAdviceHtml(diffSteps);
+    } catch (err) {
+      // swallow errors so we don't interfere with other scripts; log with unique prefix if console available
+      if (window && window.console && typeof window.console.error === 'function') {
+        console.error(_ID + ' updateAdvice error:', err);
+      }
+    }
+  }
+
+  // debounce wrapper so rapid DOM edits don't produce race conditions
+  let _debounceTimer = null;
+  function _scheduleUpdate() {
+    if (_debounceTimer) clearTimeout(_debounceTimer);
+    _debounceTimer = setTimeout(() => { _debounceTimer = null; _updateAdvice(); }, 80);
+  }
+
+  // attach MutationObserver to the two elements (if available). If not, fallback to interval poll.
+  function _attachObservers() {
+    const elTarget = document.getElementById('dc-ou');
+    const elResult = document.getElementById('res-dc-ou-re');
+
+    // if neither exists yet, still schedule initial run and retry later
+    if (!elTarget && !elResult) {
+      // try again after small delay
+      setTimeout(_attachObservers, 200);
+      return;
+    }
+
+    // observe function
+    const observeNode = (node) => {
+      if (!node) return;
+      try {
+        if (window.MutationObserver) {
+          const obs = new MutationObserver(_scheduleUpdate);
+          obs.observe(node, { childList: true, characterData: true, subtree: true });
+        } else {
+          // fallback: simple polling (rare)
+          setInterval(_scheduleUpdate, 350);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    observeNode(elTarget);
+    observeNode(elResult);
+
+    // initial update once observers set
+    _scheduleUpdate();
+  }
+
+  // run after DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _attachObservers);
+  } else {
+    // already ready
+    _attachObservers();
+  }
+
+  // expose nothing to global scope
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// ---------- Cylinder vector math (for combining with -0.25 × 180) ----------
+function cylAxisToJ(cyl, axis) {
+  const rad = (Math.PI/180) * (axis * 2);
+  const J0 = -(cyl/2) * Math.cos(rad);
+  const J45 = -(cyl/2) * Math.sin(rad);
+  return { J0, J45 };
+}
+function jToCylAxis(J0, J45) {
+  const cyl = -2 * Math.sqrt(J0*J0 + J45*J45);
+  let axis = 0.5 * Math.atan2(J45, J0) * (180/Math.PI);
+  if (axis < 0) axis += 180;
+  if (axis === 0) axis = 180; // normalize 0→180
+  return { cyl: parseFloat(cyl.toFixed(2)), axis: Math.round(axis) };
+}
+function combineCylAxis(c1, a1, c2, a2) {
+  const A = cylAxisToJ(c1, a1);
+  const B = cylAxisToJ(c2, a2);
+  return jToCylAxis(A.J0 + B.J0, A.J45 + B.J45);
+}
+
+// ---------- Effects (text) ----------
+function getCylStretchEffect(cylVal) {
+  const c = Math.abs(Number(cylVal) || 0);
+  if (c < 0.01) return null;
+  const mag = `+${c.toFixed(2)}`;
+  if (c <= 0.25) return `Change of ${mag} cyl is negligible, no noticeable stretch.`;
+  if (c <= 0.50) return `Change of ${mag} cyl will cause mild stretch of objects, easily adapted.`;
+  if (c <= 0.75) return `Change of ${mag} cyl will cause moderate stretch of objects, adaptation needed.`;
+  if (c <= 1.00) return `Change of ${mag} cyl will cause strong stretch, at the usual limit for most people.`;
+  return `Change of ${mag} cyl will cause very strong stretch, risky and requires long adaptation.`;
+}
+function nearestPrimeDist(axis) {
+  // axis in 1..180, treat 0 as 180
+  let a = Math.round(Number(axis) || 0);
+  if (a <= 0) a = 180;
+  const d90 = Math.abs(a - 90);
+  const d180 = Math.min(Math.abs(a - 180), Math.abs(a - 0));
+  const nearest = (d90 <= d180) ? 90 : 180;
+  const dist = (nearest === 90) ? d90 : d180;
+  return { dist, nearest, norm: a };
+}
+function getAxisTiltEffect(axis) {
+  const { dist, nearest, norm } = nearestPrimeDist(axis);
+  if (dist === 0) return null;
+  if (dist <= 10) return `Axis ${norm}° is near prime, minimal tilt.`;
+  return `Axis ${norm}° is a shift of ${dist}° from prime (${nearest}°), tilt noticeable.`;
+}
+
+// ---------- Difficulty scoring (your mapping) ----------
+function cylDifficulty(cyl, age) {
+  const c = Math.abs(Number(cyl) || 0);
+  const over40 = (Number(age) || 0) >= 40;
+  if (c <= 0.25) return 0;
+  if (c <= 0.50) return over40 ? 1 : 0;
+  if (c <= 0.75) return over40 ? 2 : 1;
+  if (c <= 1.00) return over40 ? 3 : 2;
+  if (c <= 1.25) return over40 ? 4 : 3;
+  return over40 ? 4 : 4;
+}
+function axisDifficulty(axis, age) {
+  const over40 = (Number(age) || 0) >= 40;
+  const { dist } = nearestPrimeDist(axis);
+  if (dist === 0) return 0;
+  if (dist <= 10) return over40 ? 1 : 0;    // outer prime
+  if (dist <= 20) return over40 ? 2 : 1;    // ±10 from outer prime
+  if (dist <= 30) return over40 ? 3 : 2;    // ±20 from prime
+  return over40 ? 4 : 3;                    // >20 from prime
+}
+function adaptLabel(total) {
+  if (total <= 0) return "No adaptation needed.";
+  if (total === 1) return "Low difficulty, adapt in 1–3 days.";
+  if (total === 2) return "Mild difficulty, adapt in 3–7 days.";
+  if (total === 3) return "Moderate difficulty, adapt in 1–2 weeks.";
+  if (total === 4) return "Upper limit, adapt in ~2 weeks.";
+  if (total === 5) return "High difficulty, adapt in 2–4 weeks.";
+  if (total === 6) return "Very high difficulty, may take 3–4+ weeks.";
+  return "Risky change, adaptation may fail or take >4 weeks.";
+}
+
+// ---------- Main analyzer ----------
+function updateAnalysisOuCylAx() {
+  let cyl = parseFloat(document.getElementById("c2_ou")?.value || "0");
+  let axis = parseFloat(document.getElementById("a2_ou")?.value || "0");
+  const age = parseFloat(document.getElementById("ageInput")?.value || "0");
+
+  // If toggle is ON, combine input with -0.25 × 180
+  if (window.extraMinus025) {
+    const combo = combineCylAxis(cyl, axis, -0.25, 180);
+    cyl = combo.cyl;
+    axis = combo.axis;
+  }
+
+  // Build output
+  let html = `
+<b><u>Astigmatism Changes Effect:</u></b>`;
+
+  // "No change" == no stretch AND axis at prime
+  const stretchText = getCylStretchEffect(cyl);
+  const { dist: dPrime } = nearestPrimeDist(axis);
+  const noChange = (!stretchText && dPrime === 0);
+
+  if (noChange) {
+    html += "<br>- No changes in prescription.";
+    document.getElementById("analysis-ou-cylax").innerHTML = html;
+    return;
+  }
+
+  const tiltText = getAxisTiltEffect(axis);
+
+  // Adaptation capability
+  let adaptText = "<b>*Key in age*</b> to generate analysis.";
+  if (age > 0) {
+    const score = cylDifficulty(cyl, age) + axisDifficulty(axis, age);
+    adaptText = adaptLabel(score);
+  }
+
+  html += `
+    - <b>Stretched Effect</b>: ${stretchText || "None"}<br>    - <b>Tilt Effect</b>: ${tiltText || "None"}<br>    - <b>Adaptation Capability</b>: ${adaptText}
+  `;
+
+  document.getElementById("analysis-ou-cylax").innerHTML = html;
+}
+
+// ---------- Auto-update from inputs ----------
+document.addEventListener("DOMContentLoaded", () => {
+  ["c2_ou","a2_ou","ageInput"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", updateAnalysisOuCylAx);
+  });
+  updateAnalysisOuCylAx(); // initial render
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// --- Shared DC Analysis Functions (COMFY CLEARER) ---
+function parseDC(dc) {
+    if (dc === null || dc === undefined) return null;
+    let s = String(dc).trim();
+    if (!s) return null;
+    s = s.replace(/−/g, '-').toUpperCase();
+    if (s === 'BAL') return { kind: 'BAL', diopter: 0, stepVal: 0, raw: s };
+    const codeMatch = s.match(/^([RG])\s*(\d+)$/i);
+    if (codeMatch) {
+        const type = codeMatch[1].toUpperCase();
+        const step = parseInt(codeMatch[2], 10);
+        const diopter = (type === 'R') ? -(step * 0.25) : (step * 0.25);
+        const stepVal = (type === 'R') ? -step : step;
+        return { kind: 'CODE', type, step, stepVal, diopter, raw: s };
+    }
+    const numStr = s.replace(/[^\d\.\-+]/g, '');
+    const n = parseFloat(numStr);
+    if (!Number.isNaN(n)) {
+        const stepVal = n / 0.25;
+        return { kind: 'NUMERIC', diopter: n, stepVal, raw: s };
+    }
+    return { kind: 'UNKNOWN', raw: s };
+}
+
+function describeDC(dc, label = 'Current') {
+    if (!dc) return '';
+    const parsed = parseDC(dc);
+    if (!parsed) return `${label} RX: ${dc}`;
+    if (parsed.kind === 'BAL') return `${label} Generally ok but far can be clearer`;
+    if (parsed.kind === 'CODE') {
+        const absD = Math.abs(parsed.diopter).toFixed(2);
+        const colourLabel = `<span style="color:${parsed.type === 'R' ? 'red' : '#0C6DC2'};">${parsed.raw}</span>`;
+        if (parsed.type === 'R') {
+            return `${label} Generally under by -${absD} (${colourLabel} = Good for seeing near but not far)`;
+        } else {
+            if (parsed.step === 1) return `${label} Generally over by +${absD} (${colourLabel} = Good for seeing far)`;
+            return `${label} Generally over by +${absD} (${colourLabel} = Good for seeing far but too strong)`;
+        }
+    }
+     return `${label} ${dc}`;
+}
+
+function getDeeperAnalysis(fromDC, toDC, prevParsed, toParsed) {
+    const f = prevParsed && typeof prevParsed === 'object' ? prevParsed : parseDC(fromDC);
+    const t = toParsed && typeof toParsed === 'object' ? toParsed : parseDC(toDC);
+    if (!f || !t || f.kind === 'UNKNOWN' || t.kind === 'UNKNOWN') return '';
+    const parts = [];
+    if (f.kind === 'BAL' && t.kind === 'BAL') return '- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.';
+    if (f.type === 'R' && t.type === 'R' && f.step === t.step) return '- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.';
+
+// Rule 1: G → G
+if (f.type === 'G' && t.type === 'G') {
+
+    // Explicitly handle G1 → G1
+    if (f.step === 1 && t.step === 1) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes:</b> No changes.<br>- <b>No changes happening.</b> ');
+    }
+    else if (t.step < f.step) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes:</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To resolve the over-correction in stages.');
+    } else if (t.step > f.step) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: #0C6DC2;">G1</span>).');
+    } else if (t.step === 1) {
+        parts.push('- <b>Distance Vision Changes:</b> No changes.<br>- <b>Near Vision Changes</b>: Improvement in near vision comfort and clarity range.<br>- <b>Purpose of change</b>: To prescribe proper distance preferred prescription.');
+    } else {
+        parts.push('- <b>Distance Vision Changes</b>: No changes.<br>- <b>Near Vision Changes</b>: No changes.');
+    }
+}
+
+
+
+// Rule 4: Distance improvement
+const distanceImprovementCond =
+    (f.kind === 'BAL' && t.type === 'G') ||
+    (f.type === 'R' && t.kind === 'BAL') ||
+    (f.type === 'R' && t.type === 'R' && t.step < f.step) ||
+    (f.type === 'R' && t.type === 'G' && t.step >= 1); // changed === 1 → >= 1
+
+if (distanceImprovementCond) {
+    if (t.type === 'G' && t.step >= 1) {
+        if (t.step === 1) {
+            parts.push(
+                '- <b>Distance Vision Changes</b>: Distance clarity will improve. See as far as possible.<br>- <b>Near Vision Changes</b>: Expect slight stress when looking at near during adaptation.<br>- <b>Purpose of Changes</b>: To improve distance clarity.'
+            );
+        } else {
+            parts.push(
+                `- <b>Distance Vision Changes</b>: Distance clarity will improve. See as far as possible but over-correction.<br>- <b>Near Vision Changes</b>: Over-correction leads to eye strains fatigue at near vision.<br>- <b>Not advisable to prescribe.</b> Reduce to (<span style="color: #0C6DC2;">G1</span>).`
+            );
+        }
+    } else {
+let gainDist = t.kind === 'BAL' ? 20 : Math.round(((1 / (t.step * 0.25)) * 3.281) * 10) / 10;
+        parts.push(
+            `- <b>Distance Vision Changes</b>: Distance clarity will improve to ${gainDist} feet. <br>- <b>Near Vision Changes</b>: Expect slight stress when looking at near during adaptation.<br>- <b>Purpose of Changes</b>: To improve distance clarity.`
+        );
+    }
+}
+
+
+    // Rule 2: Distance reduction
+    const distanceReductionCond = (t.kind === 'BAL' || t.type === 'R') && !distanceImprovementCond;
+    if (distanceReductionCond) {
+let lossDist = t.kind === 'BAL' ? 20 : Math.round(((1 / (t.step * 0.25)) * 3.281) * 10) / 10;
+        parts.push(`- <b>Distance Vision Changes</b>: Distance clarity will be reduced; blurry beyond ${lossDist} feet.<br>- <b>Near Vision Changes</b>: Near vision comfort and clarity range will improve.<br>- <b>Purpose of Changes</b>: To improve near vision comfort and clarity range.`);
+    }
+    return parts.length ? parts.join('<br>') : '';
+}
+
+
+function describeAstig() {
+    const cylRaw = document.getElementById("c2_ou")?.value.trim();
+    const axis = document.getElementById("a2_ou")?.value.trim();
+
+    // if nothing is entered at all
+    if (!cylRaw || !axis) {
+        return `. Balanced in all angles.`;
+    }
+
+    const cyl = parseFloat(cylRaw);
+
+    // zero / no astigmatism
+    if (isNaN(cyl) || cyl === 0) {
+        return `. Balanced in all angles.`;
+    }
+
+    // astigmatism present
+    return `but slightly strong at ${axis}° angle.`;
+}
+
+
+
+function getDCShiftText(fromDC, toDC) {
+    if (!fromDC || !toDC) return '';
+    const f = parseDC(fromDC);
+    const t = parseDC(toDC);
+    if (!f || !t || f.kind === 'UNKNOWN' || t.kind === 'UNKNOWN') return '';
+
+    const stepDiff = (t.stepVal || t.diopter/0.25) - (f.stepVal || f.diopter/0.25);
+    const diopterShift = stepDiff * 0.25;
+
+const line1 = 
+    describeDC(fromDC, '- <b>Current RX:</b>') + 
+    ' ' + 
+    describeAstig();
+    let line2 = '';
+
+   if (Math.abs(diopterShift) < 0.0001) {
+    line2 = '- No changes in prescription.';
+} else {
+    const mag = Math.abs(diopterShift).toFixed(2);
+    const direction = stepDiff < 0 ? '+' : '-';
+    
+    // First line: Change + swim effect
+    line2 = `- <b>Swim Effect</b>: Change of <b>${direction}${mag}</b> will cause `;
+    if (Math.abs(diopterShift) <= 0.25 + 0.001) 
+        line2 += 'slight swim effect.';
+    else if (Math.abs(diopterShift) <= 0.50 + 0.001) 
+        line2 += 'moderate swim effect.';
+    else 
+        line2 += 'obvious swim effect.';
+
+
+
+
+    // --- Second line: Tolerance Analysis ---
+    try {
+        const ageEl = document.getElementById('ageInput');
+        const age = parseFloat(ageEl.value);
+
+        if (!ageEl.value || isNaN(age) || age <= 0) {
+            line2 += '<br>- <b>Adaptation Capability</b>: <b>*Key in age*</b> to generate analysis.';
+        } else {
+            const aaEl = document.getElementById('aaOutput');
+            const aa = parseFloat(aaEl?.textContent) || 0;
+            const toleranceText = changeTolerance(aa, age);
+            const roundedMatch = toleranceText.match(/\(([\d.]+)\s*D\)/);
+            const tolVal = roundedMatch ? parseFloat(roundedMatch[1]) : null;
+
+            if (tolVal !== null && !isNaN(tolVal)) {
+                const absShift = Math.abs(diopterShift);
+                const EPS = 0.01;
+
+                line2 += '<br>- <b>Adaptation Capability</b>: ';
+                if (Math.abs(absShift - tolVal) <= EPS) {
+                    line2 += 'Noticeable changes, adapt within 2 to 4 weeks.';
+                } else if (absShift > tolVal + EPS) {
+                    line2 += 'Challenging to adapt. <b>Reduce amount of changes</b>.';
+                } else if (absShift > tolVal / 2 + EPS) {
+                    line2 += 'Noticeable changes, adapt within 2 weeks.';
+                } else {
+                    line2 += 'Small changes, easily adapt almost instantly.';
+                }
+            }
+        }
+    } catch (e) { /* silent fail */ }
+
+    // Dynamic / minification / magnification lines AFTER
+    if (diopterShift > 0) line2 += '<br>- <b>Spatial Shift</b>: Environment will look further (floor and steps become farther).<br>- <b>Size Shift</b>: Objects will look smaller (reading prints become smaller).<br>- <b>Motion perception</b>: Feels like everything moves slower.';
+    else if (diopterShift < 0) line2 += '<br>- <b>Spatial Shift</b>: Environment will look nearer (floor and steps become nearer).<br>- <b>Size Shift</b>: Objects will look bigger (reading prints become bigger).<br>- <b>Motion perception</b>: Feels like everything moves faster.';
+}
+
+
+
+
+       let line3 = '';
+    if (t.kind === 'BAL') {
+        line3 = '- <b>New Rx:</b> Well balance between distance and near vision.';
+    } else {
+        const newD = t.diopter || t.stepVal * 0.25;
+        const mag = Math.abs(newD).toFixed(2);
+        let codeLabel = '';
+        if (t.kind === 'CODE') {
+            codeLabel = `(<span style="color:${t.type==='R'?'red':'#0C6DC2'}; font-weight:normal;">${t.type}${t.step}</span>)`;
+        }
+
+        if (newD < 0) {
+            line3 = `- <b>New RX</b>: Under by -${mag} ${codeLabel}. Good for seeing near. Not seeing the furthest possible yet.`;
+        } else if (newD === 0) {
+            line3 = `- <b>New RX</b>: At -${mag} ${codeLabel}.`;
+        } else {
+            line3 = `- <b>New RX</b>: Over by +${mag} ${codeLabel}.`;
+        }
+
+        // --- Add G rules here ---
+        if (t.kind === 'CODE' && t.type === 'G') {
+            if (t.step === 1) {
+                line3 += ' Good for seeing far.';
+            } else if (t.step >= 2) {
+                line3 += ' Over-corrected prescription.';
+            }
+        }
+    }
+    const line4 = getDeeperAnalysis(fromDC, toDC, f, t);
+
+
+
+  // Write separately
+  document.getElementById("analysis-ou").innerHTML = [
+line1,
+'- <b>Recommended:</b> Distance Preferred RX.',
+    '<br><b><u>Overall Changes Anticipated</U></b>:',
+    line4
+  ].filter(Boolean).join('<br>');
+
+  document.getElementById("analysis-ou-sph").innerHTML = [
+    '<b><u>Sphere Changes Effect</u></b>:',
+    line2
+  ].filter(Boolean).join('<br>');
+
+  // Only return the "Changes" part (no Expectations here anymore)
+  return [
+line1,
+'- <b>Recommended:</b> Distance Preferred RX.',
+    '<br><b><u>Overall Changes Anticipated</U></b>:',
+    line4
+  ].filter(Boolean).join('<br>');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// --- OD/OS Analysis ---
+function updateODOSAnalysis() {
+    const oldDCR = document.getElementById('now-dc-od')?.textContent.trim() || '';
+    const newDCR = document.getElementById('res-dc-od-2')?.textContent.trim() || '';
+    const oldDCL = document.getElementById('now-dc-os')?.textContent.trim() || '';
+    const newDCL = document.getElementById('res-dc-os-2')?.textContent.trim() || '';
+    const diffRStr = (parseDC(newDCR)?.diopter || 0) - (parseDC(oldDCR)?.diopter || 0);
+    const diffLStr = (parseDC(newDCL)?.diopter || 0) - (parseDC(oldDCL)?.diopter || 0);
+    const output = `
+<b><u>Right Vision Status</U></b><br>
+${getDCShiftText(oldDCR,newDCR)}<br>
+~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  <br>
+<b><u>Left Vision Status</u></b><br>
+${getDCShiftText(oldDCL,newDCL)}<br><br>
+`;
+    document.getElementById('analysis-od-os').innerHTML = output;
+}
+
+
+
+// --- OU Analysis ---
+function updateOUAnalysis() {
+    const oldDC = document.getElementById('dc-ou')?.textContent.trim() || '';
+    const newDC = document.getElementById('res-dc-ou-re')?.textContent.trim() || '';
+    const diff = (parseDC(newDC)?.diopter || 0) - (parseDC(oldDC)?.diopter || 0);
+    const output = `<b><u>Vision Status</U></b><br>${getDCShiftText(oldDC,newDC)}<br>
+`;
+    document.getElementById('analysis-ou').innerHTML = output;
+}
+
+// --- Input Triggers and Mutation Observers ---
+// OD/OS inputs
+['dc-sph-od','c2_od','a2_od','dc-sph-os','c2_os','a2_os'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input',updateODOSAnalysis);
+    el.addEventListener('blur',()=>updateODOSAnalysis());
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();updateODOSAnalysis();}});
+});
+// OD/OS mutation observers
+['now-dc-od','res-dc-od-2','now-dc-os','res-dc-os-2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    new MutationObserver(updateODOSAnalysis).observe(el,{childList:true,characterData:true,subtree:true});
+});
+
+// OU inputs
+['dc-sph-od','c2_od','a2_od','dc-sph-os','c2_os','a2_os'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input',updateOUAnalysis);
+    el.addEventListener('blur',()=>updateOUAnalysis());
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();updateOUAnalysis();}});
+});
+// OU mutation observers
+['dc-ou','res-dc-ou-re'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    new MutationObserver(updateOUAnalysis).observe(el,{childList:true,characterData:true,subtree:true});
+});
+
+// --- Run once on load ---
+window.addEventListener('DOMContentLoaded',()=>{
+    updateODOSAnalysis();
+    updateOUAnalysis();
+});
+</script>
+<script>
+// --- Binocular Merged Plan Add-On ---
+function updateMergedPlan() {
+  const oldDCR = document.getElementById('now-dc-od')?.textContent.trim() || '';
+  const newDCR = document.getElementById('res-dc-od-2')?.textContent.trim() || '';
+  const oldDCL = document.getElementById('now-dc-os')?.textContent.trim() || '';
+  const newDCL = document.getElementById('res-dc-os-2')?.textContent.trim() || '';
+
+  const fR = parseDC(oldDCR), tR = parseDC(newDCR);
+  const fL = parseDC(oldDCL), tL = parseDC(newDCL);
+
+  if (!fR || !tR || !fL || !tL) return;
+
+  // --- Compute total change ---
+  const diffR = (tR.diopter || 0) - (fR.diopter || 0);
+  const diffL = (tL.diopter || 0) - (fL.diopter || 0);
+
+  // --- SE Diff ---
+  const seDiff = Math.abs(diffR - diffL);
+
+  // Adaptation time rule
+  let adaptText = "";
+  if (seDiff <= 0.25) adaptText = "Likely mild binocular imbalance; adaptation 1–2 weeks.";
+  else if (seDiff <= 0.50) adaptText = "Moderate imbalance; adaptation 2–4 weeks.";
+  else adaptText = "High imbalance (>0.50); possible adaptation failure, especially in older patients.";
+
+  // --- Distance blur merge ---
+  function getBlurDist(parsed) {
+    if (parsed.kind === "BAL") return 20;
+    if (parsed.type === "R") return 20 / Math.pow(2, parsed.step - 1);
+    if (parsed.type === "G" && parsed.step > 1) return 20; // over G1 = max distance
+    return 20;
+  }
+  const blurR = getBlurDist(tR);
+  const blurL = getBlurDist(tL);
+  const minBlur = Math.min(blurR, blurL); // stricter
+  const maxBlur = Math.max(blurR, blurL); // looser
+  const blurText = (blurR !== blurL)
+    ? `Distance vision: semi-blur beyond ${minBlur}ft, noticeable blur beyond ${maxBlur}ft.`
+    : `Distance vision: blur beyond ${minBlur}ft.`;
+
+  // --- Near vision comfort merge ---
+  let nearText = "";
+  const nearR = diffR < 0 ? "improve" : (diffR > 0 ? "reduce" : "same");
+  const nearL = diffL < 0 ? "improve" : (diffL > 0 ? "reduce" : "same");
+  if (nearR === "improve" && nearL === "improve") {
+    nearText = "Near vision comfort improved.";
+  } else if (nearR === "reduce" && nearL === "reduce") {
+    nearText = "Near vision comfort reduced.";
+  } else if ((nearR === "improve" && nearL === "reduce") ||
+             (nearR === "reduce" && nearL === "improve")) {
+    nearText = "Mixed binocular comfort — may cause headaches or double vision due to conflicting focal points.";
+  } else {
+    nearText = "Near vision comfort unchanged.";
+  }
+
+  // --- Output ---
+  const mergedOutput = `
+  <br><b><u>Binocular (Merged) Plan</u></b><br>
+  - Total change: Right eye ${diffR.toFixed(2)}, Left eye ${diffL.toFixed(2)}<br>
+  - SE Diff: ${seDiff.toFixed(2)}<br>
+  - ${adaptText}<br>
+  - ${blurText}<br>
+  - ${nearText}<br><br>
+  `;
+
+  // Inject after OD/OS analysis
+  const target = document.getElementById("analysis-od-os");
+  if (target) {
+    if (!document.getElementById("merged-plan")) {
+      const div = document.createElement("div");
+      div.id = "merged-plan";
+      target.appendChild(div);
+    }
+    document.getElementById("merged-plan").innerHTML = mergedOutput;
+  }
+}
+
+// Hook into existing updateODOSAnalysis
+const oldUpdateODOS = updateODOSAnalysis;
+updateODOSAnalysis = function() {
+  oldUpdateODOS();
+  updateMergedPlan();
+};
+
+// Run on load
+window.addEventListener("DOMContentLoaded", updateMergedPlan);
+</script>
+
+
+
+
+
+
+
+<script>
+// --- universal toggle handler ---
+function makeToggle(buttonId, sectionId) {
+  const btn = document.getElementById(buttonId);
+  const section = document.getElementById(sectionId);
+
+  if (!btn || !section) return;
+
+  btn.addEventListener("click", () => {
+    const hidden = section.style.display === "none" || section.style.display === "";
+    section.style.display = hidden ? "block" : "none";
+    btn.textContent = hidden
+      ? `▲ ${btn.textContent.replace("▼", "").replace("▲", "").trim()}`
+      : `▼ ${btn.textContent.replace("▼", "").replace("▲", "").trim()}`;
+  });
+}
+
+makeToggle("toggle-manual1", "exam-manual1");
+makeToggle("toggle-manual", "exam-manual");
+makeToggle("toggle-comfy", "exam-comfy");
+makeToggle("toggle-sharpest", "exam-sharpest");
+
+
+</script>
+
+
+
+<script>
+function formatDiopter(v) {
+    if (v < 0) v = 0;
+    return "+" + v.toFixed(2);
+}
+
+function calculate() {
+    const base = parseFloat(document.getElementById('add-ou').value) || 0;
+    const farchanges = parseFloat(document.getElementById('dc-sph-ou').value) || 0;
+    const nearRaw = parseFloat(document.getElementById('near-dc-sph-ou').value) || 0;
+    const interRaw = parseFloat(document.getElementById('inter-dc-sph-ou').value) || 0;
+
+    const nearFinal = base + nearRaw - farchanges + 0.250;
+    const interFinal = base + interRaw - farchanges + 0.250;
+
+    document.getElementById('result-near').textContent = formatDiopter(nearFinal);
+    document.getElementById('result-inter').textContent = formatDiopter(interFinal);
+}
+
+['add-ou','near-dc-sph-ou','inter-dc-sph-ou','dc-sph-ou'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculate);
+});
+
+calculate();
+</script>
+
+
+
+
+
+
+<script>
+(function(){
+  let sMinusApplied = false;
+
+  function applySMinus025() {
+    if (sMinusApplied) return; // prevent repeated clicks
+    const sMinus025 = document.querySelector(".sph-btn[data-step='-0.25']");
+    if (sMinus025 && !sMinus025.classList.contains('active')) {
+      sMinusApplied = true;
+      sMinus025.click();
+      // optional: reset flag after a short delay in case needed for future recalcs
+      setTimeout(() => { sMinusApplied = false; }, 200);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", applySMinus025);
+
+  if (typeof window.updateDC === "function") {
+    const originalUpdateDC = window.updateDC;
+    window.updateDC = function(...args){
+      originalUpdateDC(...args);
+      applySMinus025();
+    };
+  } else {
+    const observer = new MutationObserver(applySMinus025);
+    observer.observe(document.getElementById('dc-advice'), { childList:true, subtree:true });
+  }
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="display:flex; justify-content:center; margin-top:10px;">
+  <button onclick="goToReport()" 
+          style="padding:10px 20px; background:#DBB47B; color: black; border:1px solid black; border-radius:6px; cursor:pointer;">
+    <b>Go To Report</b>
+  </button>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+function goToReport() {
+  const data = {
+    suffix: document.getElementById("Suffix")?.value || "",
+    name: document.getElementById("nameInput")?.value || "",
+    age: document.getElementById("ageInput")?.value || "",
+    currentWear: document.querySelector("input[name='current-wearType']:checked")?.value || "",
+wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
+
+
+    /* CURRENT RX */
+    s1_od: document.getElementById("s1_od")?.value || "",
+    c1_od: document.getElementById("c1_od")?.value || "",
+    a1_od: document.getElementById("a1_od")?.value || "",
+    s1_os: document.getElementById("s1_os")?.value || "",
+    c1_os: document.getElementById("c1_os")?.value || "",
+    a1_os: document.getElementById("a1_os")?.value || "",
+    nowSeDiff: document.getElementById("now-se-diff-od")?.textContent || "",
+
+    /* ADD */
+    add_ou: document.getElementById("add-ou")?.value || "",
+    addOutput: document.getElementById("addOutput")?.textContent || "–",
+    addOutput2: document.getElementById("addOutput2")?.textContent || "–",
+resultNear: document.getElementById("result-near")?.textContent || "–",
+resultInter: document.getElementById("result-inter")?.textContent || "–",
+
+
+    /* EXAMINATION (ADJUSTED FC + DC) */
+    "dc-sph-ou": document.getElementById("dc-sph-ou")?.value || "",
+    "a2-ou": document.getElementById("a2_ou")?.value || "",
+    "c2_ou": document.getElementById("c2_ou")?.value || "",
+
+finalR: {
+  sph:  document.getElementById("final-sph-ou-re")?.textContent.trim() || "",
+  cyl:  document.getElementById("final-cyl-ou-re")?.textContent.trim() || "",
+  axis: document.getElementById("final-axis-ou-re")?.textContent.trim() || "",
+  se:   document.getElementById("final-se-ou-re")?.textContent.trim() || "",
+  dc:   document.getElementById("final-dc-ou-re")?.textContent.trim() || "",
+},
+finalL: {
+  sph:  document.getElementById("final-sph-ou-le")?.textContent.trim() || "",
+  cyl:  document.getElementById("final-cyl-ou-le")?.textContent.trim() || "",
+  axis: document.getElementById("final-axis-ou-le")?.textContent.trim() || "",
+  se:   document.getElementById("final-se-ou-le")?.textContent.trim() || "",
+  dc:   document.getElementById("final-dc-ou-le")?.textContent.trim() || "",
+},
+
+
+
+    /* COMFY CLEARER FINAL */
+    comfyR: {
+      sph: document.getElementById("res-sph-ou-re")?.textContent || "",
+      cyl: document.getElementById("res-cyl-ou-re")?.textContent || "",
+      axis: document.getElementById("res-axis-ou-re")?.textContent || "",
+      dc: document.getElementById("res-dc-ou-re")?.textContent || "",
+    },
+    comfyL: {
+      sph: document.getElementById("res-sph-ou-le")?.textContent || "",
+      cyl: document.getElementById("res-cyl-ou-le")?.textContent || "",
+      axis: document.getElementById("res-axis-ou-le")?.textContent || "",
+      dc: document.getElementById("res-dc-ou-le")?.textContent || "",
+    },
+    comfySeDiff: document.getElementById("res-se-diff-ou-re")?.textContent || "",
+    comfyNotes: document.getElementById("extra-notes-comfy")?.value || "",
+    comfyAnalysis:       document.getElementById("analysis-ou")?.innerHTML || "",
+    comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
+    comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
+
+
+
+    /* EXTRA NOTES */
+    extraNotes: document.getElementById("extra-notes-comfy")?.value || ""
+  };
+
+  localStorage.setItem("rxReport", JSON.stringify(data));
+  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
+
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+</div>
+
+
+<!-- Spacer at the bottom for scrolling -->
+<div style="height:300px;"></div>
+
+
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
