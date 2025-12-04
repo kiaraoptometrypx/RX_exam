@@ -2,24 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Rotatable Radial Angular Blur</title>
+<title>Safari-Compatible Rotatable Radial Blur</title>
 <style>
-  body {margin:20px; font-family:system-ui;}
-  canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
-  label {margin-left:10px;}
-  input[type=range] {
-    -webkit-appearance: none;  /* needed for iOS Safari */
-    width: 900px; 
-    height: 8px; 
-    background: #ddd; 
-    border-radius: 4px;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px; height: 18px;
-    background: #333; border-radius: 50%;
-    cursor: pointer;
-  }
+body {margin:20px; font-family:system-ui;}
+canvas {border:1px solid #ccc; display:block; margin-bottom:20px;}
+label {margin-left:10px;}
+input[type=range] {
+  -webkit-appearance: none;
+  width: 900px; height: 8px; background: #ddd; border-radius: 4px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; background: #333; border-radius: 50%; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -45,71 +40,43 @@ const img = new Image();
 img.crossOrigin = "anonymous";
 img.src = RAW;
 
-let levels = 4;
+let levels = 8;       // number of blur steps
 let maxBlur = 4;
-let gamma = 0.75; // smoother, more even blur
+let gamma = 0.75;     // controls smoothness
 let rotationDeg = 0;
-let layers = [];
 
-img.onload = async () => {
-  generateLayers();
-  drawBlur();
-};
+img.onload = () => drawBlur();
 
-// generate blur layers
-function generateLayers() {
-  layers = [];
-  for(let i=0;i<levels;i++){
-    const off = document.createElement("canvas");
-    off.width = w; off.height = h;
-    const octx = off.getContext("2d");
-    const blurPx = (i/(levels-1)) * maxBlur;
-    octx.filter = `blur(${blurPx}px)`;
-    octx.drawImage(img, 0, 0, w, h);
-    layers.push(octx.getImageData(0,0,w,h));
-  }
-}
-
-// compute angular factor for each pixel
+// Compute angular factor for pixel (0..1)
 function angularFactor(x,y){
-  const dx = x - cx;
-  const dy = y - cy;
-  let theta = Math.atan2(dy, dx); // radians
-  theta -= rotationDeg * Math.PI/180; // apply rotation
+  const dx = x-cx;
+  const dy = y-cy;
+  let theta = Math.atan2(dy, dx) - rotationDeg * Math.PI/180;
   let v = (Math.cos(2*theta)+1)/2;
   return Math.pow(v, gamma);
 }
 
-// blend layers per pixel
+// Draw image with angular blur
 function drawBlur(){
-  const result = ctx.createImageData(w,h);
-  const out = result.data;
+  ctx.clearRect(0,0,w,h);
 
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const idx = (y*w+x)*4;
-      const f = angularFactor(x,y);
-      const floatIndex = f*(levels-1);
-      const i0 = Math.floor(floatIndex);
-      const i1 = Math.min(levels-1,i0+1);
-      const t = floatIndex-i0;
-
-      const d0 = layers[i0].data, d1 = layers[i1].data;
-      out[idx]   = Math.round(d0[idx]*(1-t)+d1[idx]*t);
-      out[idx+1] = Math.round(d0[idx+1]*(1-t)+d1[idx+1]*t);
-      out[idx+2] = Math.round(d0[idx+2]*(1-t)+d1[idx+2]*t);
-      out[idx+3] = d0[idx+3];
-    }
+  // Draw multiple blurred copies with alpha blending
+  for(let i=0;i<levels;i++){
+    const blurPx = (i/(levels-1))*maxBlur;
+    ctx.filter = `blur(${blurPx}px)`;
+    ctx.globalAlpha = 1.0 / levels; // simple even blend
+    ctx.drawImage(img,0,0,w,h);
   }
 
-  ctx.putImageData(result,0,0);
+  ctx.filter = 'none';
+  ctx.globalAlpha = 1.0;
 }
 
-// unified slider handler for iPad Safari
+// Rotation slider
 function setupSlider(id, callback){
-  const slider = document.getElementById(id);
-  slider.addEventListener("input", callback);
-  slider.addEventListener("change", callback); // ensures iOS catches it
+  const s = document.getElementById(id);
+  s.addEventListener("input", callback);
+  s.addEventListener("change", callback);
 }
 
 setupSlider("rotation", e=>{
@@ -121,7 +88,6 @@ setupSlider("rotation", e=>{
 setupSlider("maxBlur", e=>{
   maxBlur = +e.target.value;
   document.getElementById("blurVal").textContent = maxBlur;
-  generateLayers();
   drawBlur();
 });
 </script>
