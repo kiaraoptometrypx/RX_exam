@@ -674,6 +674,27 @@ function setFontSize(size, btn) {
 </select>
   </td>
 </tr>
+
+<tr class="paleblue">
+    <td style="height:25px">Inter Add</td>
+<td>BE</td>
+    <td><input type="text" id="manual-inter-add" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
+<tr class="paleblue">
+    <td style="height:25px">Near Add</td>
+<td>BE</td>
+    <td><input type="text" id="manual-near-add" placeholder="+0.00" inputmode="decimal" pattern="^[+\-]?\d*\.?\d*$"></td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+
 <tr class="paleblue">
   <!-- This cell spans 2 rows -->
   <td rowspan="2" colspan="1"><b>Extra Notes:</b></td>
@@ -1544,6 +1565,37 @@ document.querySelectorAll("select.dc-select").forEach(sel => {
 </script>
 
 
+<script>
+function formatToNearestQuarterPlus(value) {
+  let num = parseFloat(value);
+  if (isNaN(num)) return "+0.00";
+  let rounded = Math.round(num / 0.25) * 0.25;
+  return (rounded >= 0 ? "+" : "") + rounded.toFixed(2);
+}
+
+function attachManualAddHandlers() {
+  const ids = ["manual-inter-add", "manual-near-add"];
+  
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    // Snap on blur
+    el.addEventListener("blur", () => {
+      el.value = formatToNearestQuarterPlus(el.value.trim());
+    });
+
+    // Optional: live formatting while typing
+    el.addEventListener("input", () => {
+      let val = el.value.replace(/[^0-9\.\-+]/g, ""); // allow only numbers, dot, plus, minus
+      el.value = val;
+    });
+  });
+}
+
+// Run after DOM is ready
+document.addEventListener("DOMContentLoaded", attachManualAddHandlers);
+</script>
 
 
 
@@ -3334,18 +3386,18 @@ calculate();
 
 
 
+<div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
 
-
-
-
-
-
-
-<div style="display:flex; justify-content:center; margin-top:10px;">
-  <button onclick="goToReport()" 
-          style="padding:10px 20px; background:#DBB47B; color: black; border:1px solid black; border-radius:6px; cursor:pointer;">
-    <b>Go To Report</b>
+  <button onclick="goToAutoReport()"
+          style="padding:10px 20px; background:#DBB47B; color:black; border:1px solid black; border-radius:6px; cursor:pointer;">
+    <b>Auto Report</b>
   </button>
+
+<button onclick="goToReportManual()"
+          style="padding:10px 20px; background:#DBB47B; color:black; border:1px solid black; border-radius:6px; cursor:pointer;">
+    <b>Manual Report</b>
+  </button>
+
 </div>
 
 
@@ -3356,17 +3408,14 @@ calculate();
 
 
 
-
-
 <script>
-function goToReport() {
+function goToAutoReport() {
   const data = {
     suffix: document.getElementById("Suffix")?.value || "",
     name: document.getElementById("nameInput")?.value || "",
     age: document.getElementById("ageInput")?.value || "",
     currentWear: document.querySelector("input[name='current-wearType']:checked")?.value || "",
-wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
-
+    wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
 
     /* CURRENT RX */
     s1_od: document.getElementById("s1_od")?.value || "",
@@ -3381,31 +3430,29 @@ wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
     add_ou: document.getElementById("add-ou")?.value || "",
     addOutput: document.getElementById("addOutput")?.textContent || "–",
     addOutput2: document.getElementById("addOutput2")?.textContent || "–",
-resultNear: document.getElementById("result-near")?.textContent || "–",
-resultInter: document.getElementById("result-inter")?.textContent || "–",
-
+    resultNear: document.getElementById("result-near")?.textContent || "–",
+    resultInter: document.getElementById("result-inter")?.textContent || "–",
 
     /* EXAMINATION (ADJUSTED FC + DC) */
     "dc-sph-ou": document.getElementById("dc-sph-ou")?.value || "",
     "a2-ou": document.getElementById("a2_ou")?.value || "",
     "c2_ou": document.getElementById("c2_ou")?.value || "",
 
-finalR: {
-  sph:  document.getElementById("final-sph-ou-re")?.textContent.trim() || "",
-  cyl:  document.getElementById("final-cyl-ou-re")?.textContent.trim() || "",
-  axis: document.getElementById("final-axis-ou-re")?.textContent.trim() || "",
-  se:   document.getElementById("final-se-ou-re")?.textContent.trim() || "",
-  dc:   document.getElementById("final-dc-ou-re")?.textContent.trim() || "",
-},
-finalL: {
-  sph:  document.getElementById("final-sph-ou-le")?.textContent.trim() || "",
-  cyl:  document.getElementById("final-cyl-ou-le")?.textContent.trim() || "",
-  axis: document.getElementById("final-axis-ou-le")?.textContent.trim() || "",
-  se:   document.getElementById("final-se-ou-le")?.textContent.trim() || "",
-  dc:   document.getElementById("final-dc-ou-le")?.textContent.trim() || "",
-},
-
-
+    /* FINAL RX */
+    finalR: {
+      sph:  document.getElementById("final-sph-ou-re")?.textContent.trim() || "",
+      cyl:  document.getElementById("final-cyl-ou-re")?.textContent.trim() || "",
+      axis: document.getElementById("final-axis-ou-re")?.textContent.trim() || "",
+      se:   document.getElementById("final-se-ou-re")?.textContent.trim() || "",
+      dc:   document.getElementById("final-dc-ou-re")?.textContent.trim() || "",
+    },
+    finalL: {
+      sph:  document.getElementById("final-sph-ou-le")?.textContent.trim() || "",
+      cyl:  document.getElementById("final-cyl-ou-le")?.textContent.trim() || "",
+      axis: document.getElementById("final-axis-ou-le")?.textContent.trim() || "",
+      se:   document.getElementById("final-se-ou-le")?.textContent.trim() || "",
+      dc:   document.getElementById("final-dc-ou-le")?.textContent.trim() || "",
+    },
 
     /* COMFY CLEARER FINAL */
     comfyR: {
@@ -3426,21 +3473,147 @@ finalL: {
     comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
     comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
 
+    /* MANUAL RX */
+    fcDcError: document.getElementById("fc-dc-error")?.value || "",
+    dcSphOUManual: document.getElementById("dc-sph-ou-manual-notes")?.value || "",
+    c2OUManual: document.getElementById("c2_ou_manual_notes")?.value || "",
+    a2OUManual: document.getElementById("a2_ou_manual_notes")?.value || "",
 
+    dcSphODManual: document.getElementById("dc-sph-od-manual-notes")?.value || "",
+    c2ODManual: document.getElementById("c2_od_manual_notes")?.value || "",
+    a2ODManual: document.getElementById("a2_od_manual_notes")?.value || "",
+
+    dcSphOSManual: document.getElementById("dc-sph-os-manual-notes")?.value || "",
+    c2OSManual: document.getElementById("c2_os_manual_notes")?.value || "",
+    a2OSManual: document.getElementById("a2_os_manual_notes")?.value || "",
+
+    manualWearGlasses: document.getElementById("manual-ou-wear-glasses")?.checked || false,
+    manualWearContacts: document.getElementById("manual-ou-wear-contacts")?.checked || false,
+
+    manualSphOD: document.getElementById("manual-sph-ou-od")?.value || "",
+    manualCylOD: document.getElementById("manual-cyl-ou-od")?.value || "",
+    manualAxisOD: document.getElementById("manual-axis-ou-od")?.value || "",
+
+    manualSphOS: document.getElementById("manual-sph-ou-os")?.value || "",
+    manualCylOS: document.getElementById("manual-cyl-ou-os")?.value || "",
+    manualAxisOS: document.getElementById("manual-axis-ou-os")?.value || "",
+
+    manualExtraNotes: document.getElementById("extra-notes-manual")?.value || "",
 
     /* EXTRA NOTES */
     extraNotes: document.getElementById("extra-notes-comfy")?.value || ""
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
-
+  window.open("report.html");
 }
+
 </script>
 
+<script>
+function goToReportManual() {
+  const data = {
+    suffix: document.getElementById("Suffix")?.value || "",
+    name: document.getElementById("nameInput")?.value || "",
+    age: document.getElementById("ageInput")?.value || "",
+    currentWear: document.querySelector("input[name='current-wearType']:checked")?.value || "",
+    wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
+
+    /* CURRENT RX */
+    s1_od: document.getElementById("s1_od")?.value || "",
+    c1_od: document.getElementById("c1_od")?.value || "",
+    a1_od: document.getElementById("a1_od")?.value || "",
+    s1_os: document.getElementById("s1_os")?.value || "",
+    c1_os: document.getElementById("c1_os")?.value || "",
+    a1_os: document.getElementById("a1_os")?.value || "",
+    nowSeDiff: document.getElementById("now-se-diff-od")?.textContent || "",
+
+    /* ADD */
+    add_ou: document.getElementById("add-ou")?.value || "",
+    addOutput: document.getElementById("addOutput")?.textContent || "–",
+    addOutput2: document.getElementById("addOutput2")?.textContent || "–",
+    resultNear: document.getElementById("result-near")?.textContent || "–",
+    resultInter: document.getElementById("result-inter")?.textContent || "–",
+
+    /* EXAMINATION (ADJUSTED FC + DC) */
+    "dc-sph-ou": document.getElementById("dc-sph-ou")?.value || "",
+    "a2-ou": document.getElementById("a2_ou")?.value || "",
+    "c2_ou": document.getElementById("c2_ou")?.value || "",
+
+    /* FINAL RX */
+    finalR: {
+      sph:  document.getElementById("final-sph-ou-re")?.textContent.trim() || "",
+      cyl:  document.getElementById("final-cyl-ou-re")?.textContent.trim() || "",
+      axis: document.getElementById("final-axis-ou-re")?.textContent.trim() || "",
+      se:   document.getElementById("final-se-ou-re")?.textContent.trim() || "",
+      dc:   document.getElementById("final-dc-ou-re")?.textContent.trim() || "",
+    },
+    finalL: {
+      sph:  document.getElementById("final-sph-ou-le")?.textContent.trim() || "",
+      cyl:  document.getElementById("final-cyl-ou-le")?.textContent.trim() || "",
+      axis: document.getElementById("final-axis-ou-le")?.textContent.trim() || "",
+      se:   document.getElementById("final-se-ou-le")?.textContent.trim() || "",
+      dc:   document.getElementById("final-dc-ou-le")?.textContent.trim() || "",
+    },
+
+    /* COMFY CLEARER FINAL */
+    comfyR: {
+      sph: document.getElementById("res-sph-ou-re")?.textContent || "",
+      cyl: document.getElementById("res-cyl-ou-re")?.textContent || "",
+      axis: document.getElementById("res-axis-ou-re")?.textContent || "",
+      dc: document.getElementById("res-dc-ou-re")?.textContent || "",
+    },
+    comfyL: {
+      sph: document.getElementById("res-sph-ou-le")?.textContent || "",
+      cyl: document.getElementById("res-cyl-ou-le")?.textContent || "",
+      axis: document.getElementById("res-axis-ou-le")?.textContent || "",
+      dc: document.getElementById("res-dc-ou-le")?.textContent || "",
+    },
+    comfySeDiff: document.getElementById("res-se-diff-ou-re")?.textContent || "",
+    comfyNotes: document.getElementById("extra-notes-comfy")?.value || "",
+    comfyAnalysis:       document.getElementById("analysis-ou")?.innerHTML || "",
+    comfyAnalysisSph:    document.getElementById("analysis-ou-sph")?.innerHTML || "",
+    comfyAnalysisCylAx:  document.getElementById("analysis-ou-cylax")?.innerHTML || "",
+
+    /* MANUAL RX */
+    fcDcError: document.getElementById("fc-dc-error")?.value || "",
+    dcSphOUManual: document.getElementById("dc-sph-ou-manual-notes")?.value || "",
+    c2OUManual: document.getElementById("c2_ou_manual_notes")?.value || "",
+    a2OUManual: document.getElementById("a2_ou_manual_notes")?.value || "",
+
+    dcSphODManual: document.getElementById("dc-sph-od-manual-notes")?.value || "",
+    c2ODManual: document.getElementById("c2_od_manual_notes")?.value || "",
+    a2ODManual: document.getElementById("a2_od_manual_notes")?.value || "",
+
+    dcSphOSManual: document.getElementById("dc-sph-os-manual-notes")?.value || "",
+    c2OSManual: document.getElementById("c2_os_manual_notes")?.value || "",
+    a2OSManual: document.getElementById("a2_os_manual_notes")?.value || "",
+
+    manualWearGlasses: document.getElementById("manual-ou-wear-glasses")?.checked || false,
+    manualWearContacts: document.getElementById("manual-ou-wear-contacts")?.checked || false,
+
+    manualSphOD: document.getElementById("manual-sph-ou-od")?.value || "",
+    manualCylOD: document.getElementById("manual-cyl-ou-od")?.value || "",
+    manualAxisOD: document.getElementById("manual-axis-ou-od")?.value || "",
+
+    manualSphOS: document.getElementById("manual-sph-ou-os")?.value || "",
+    manualCylOS: document.getElementById("manual-cyl-ou-os")?.value || "",
+    manualAxisOS: document.getElementById("manual-axis-ou-os")?.value || "",
+manualInterAdd: document.getElementById("manual-inter-add")?.value || "",
+manualNearAdd: document.getElementById("manual-near-add")?.value || "",
 
 
+    manualExtraNotes: document.getElementById("extra-notes-manual")?.value || "",
 
+    /* EXTRA NOTES */
+    extraNotes: document.getElementById("extra-notes-comfy")?.value || ""
+  };
+
+  localStorage.setItem("rxReport", JSON.stringify(data));
+  window.open("report_manual.html");
+}
+
+</script>
 
 
 
