@@ -338,19 +338,19 @@ function setFontSize(size, btn) {
 
 <br>
 
-<div class="pane" style="padding:30px 10px 30px 10px;">
+<div class="pane" style="padding:10px 10px 10px 10px;">
 
 <div style="display:flex; justify-content:center;">
-  <b><span>
+  <h1>
 
     Customer Details & Eye exam
-  </span></b>
+  </h1>
 </div>
 
 
 
 <div id="customer-details"">
-<div style="height:30px;"></div>
+<div style="height:5px;"></div>
 
 <div class="pane">
 
@@ -498,10 +498,10 @@ function setFontSize(size, btn) {
 
 <div style="height:10px;"></div>
 
-    <div class="pane" style="padding:0 0 10px 0;">
+    <div class="pane" style="padding:10 0 10px 0;">
 
 
-<span id="toggle-manual1" style="margin-left:5%; cursor:pointer; user-select:none;">▼ Manual</span>
+<span id="toggle-manual1" style="margin-left:7%; cursor:pointer; user-select:none;">▼ Manual</span>
 
 
 <div id="exam-manual1" style="display:none">
@@ -713,19 +713,24 @@ function setFontSize(size, btn) {
 </tbody>
 
 </table>
+
+
+<div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+
 <button onclick="goToReportManual()"
-          style="padding:10px 20px; background:#DBB47B; color:black; border:1px solid black; border-radius:6px; cursor:pointer;">
+          style="padding:10px 20px; background:#D8EFF8; color:black; border:1px solid grey; border-radius:6px; cursor:pointer;">
     <b>Manual Report</b>
   </button>
+</div>
 
 </div>
 
-
-
-</div>
 </div>
 
+</div>
+<div style="height:10px;"></div>
 
+    <div class="pane" style="padding:0 0 10px 0;">
 <div id="exam-comfy">
 <table>
 <tr class="calibrator">
@@ -1004,6 +1009,13 @@ function setFontSize(size, btn) {
 </tbody>
 
 </table>
+
+<div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+
+  <button onclick="goToAutoReport()"
+          style="padding:10px 20px; background:#E5F0D1; color:black; border:1px solid grey; border-radius:6px; cursor:pointer;">
+    <b>Generate Vision Report</b>
+  </button>
 
 </div>
 
@@ -3395,16 +3407,11 @@ calculate();
 
 
 
-<div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
-
-  <button onclick="goToAutoReport()"
-          style="padding:10px 20px; background:#DBB47B; color:black; border:1px solid black; border-radius:6px; cursor:pointer;">
-    <b>Auto Report</b>
-  </button>
 
 
 
 
+</div>
 
 
 
