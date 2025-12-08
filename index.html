@@ -418,40 +418,77 @@ function setFontSize(size, btn) {
 </tr>
 
 
-  <!-- Now RX -->
-  <tr>
-<td rowspan="2">
+<!-- pre New RX -->
+<tr>
+<td rowspan="2" style="height:60px">
   <div class="choice-group">
-    <input type="radio" id="current-wear-glasses" name="current-wearType" value="glasses">
-    <label for="current-wear-glasses">Glasses</label>
-</div>
-<div style="height:3px"></div>
+    <input type="radio" id="pre-current-wear-glasses" name="pre-current-wearType" value="glasses">
+    <label for="pre-current-wear-glasses">Glasses</label>
+  </div>
+  <div style="height:5px"></div>
 
   <div class="choice-group">
-    <input type="radio" id="current-wear-contacts" name="current-wearType" value="contacts">
-    <label for="current-wear-contacts">Contacts</label>
+    <input type="radio" id="pre-current-wear-contacts" name="pre-current-wearType" value="contacts">
+    <label for="pre-current-wear-contacts">Contacts</label>
   </div>
-<div style="height:3px"></div>
-<div>BVD
-  <input type="number" id="bvdInput" value="13" step="0.5" min="5" max="20" style="width:30px; text-align:center;">
-</div>
+
+</td>
+<td>R</td>
+
+<td><input id="pre-s1_od" placeholder="+0.00"></td>
+<td><input id="pre-c1_od" placeholder="+0.00"></td>
+<td><input id="pre-a1_od" placeholder="0"></td>
+
+<td id="now-se-diff-od">—</td>
+<td rowspan="2">
+<input id="add-ou" placeholder="+0.00">
+</td>
+</tr>
+
+<tr>
+<td>L</td>
+
+<td><input id="pre-s1_os" placeholder="+0.00"></td>
+<td><input id="pre-c1_os" placeholder="+0.00"></td>
+<td><input id="pre-a1_os" placeholder="0"></td>
+
+<td>—</td>
+</tr>
+
+
+
+
+
+
+
+  <!-- Now RX -->
+  <tr style="display:none">
+<td rowspan="2">
+
+
 </td>
     <td>R</td>
+
+
     <td><input id="s1_od" placeholder="+0.00"></td>
     <td><input id="c1_od" placeholder="+0.00"></td>
     <td><input id="a1_od" placeholder="0"></td>
-    <td id="now-se-diff-od">—</td>
+
+
+    <td>—</td>
 <td rowspan="2">
-<input id="add-ou" placeholder="+0.00">
-</div></td>
+-</div></td>
   </tr>
 
-  <tr>
+  <tr style="display:none">
 
     <td>L</td>
+
     <td><input id="s1_os" placeholder="+0.00"></td>
     <td><input id="c1_os" placeholder="+0.00"></td>
     <td><input id="a1_os" placeholder="0"></td>
+
+
     <td>—</td>
 
 
@@ -879,11 +916,8 @@ function setFontSize(size, btn) {
   </tr>
 
 <tr class="comfort">
-<td style="border-bottom:none;">
-  <div class="choice-group">
-    <input type="radio" id="wear-glasses" name="wearType" value="glasses">
-    <label for="wear-glasses">Glasses</label>
-</div>
+<td rowspan="2" style="height:48px"> Glasses 
+
 </td>
 
 <td>R</td>
@@ -896,12 +930,7 @@ function setFontSize(size, btn) {
   </tr>
 
 <tr class="comfort">
-<td style="border-top:none;">
-  <div class="choice-group">
-    <input type="radio" id="wear-contacts" name="wearType" value="contacts">
-    <label for="wear-contacts">Contacts</label>
-  </div>
-</td>
+
  <td>L</td>
     <td id="res-sph-ou-le">0.00</td>
     <td id="res-cyl-ou-le">0.00</td>
@@ -1192,7 +1221,7 @@ function setFontSize(size, btn) {
     <td id="res-dc-os-2">BAL</td> 
   </tr>
 
-<tr class="now-comfort adj2" style="display:none;">
+<tr class="now-comfort adj2" s;">
 
 <td rowspan="3">Adjustments</td>
 <td style="display:none;">Both</td>
@@ -1299,6 +1328,169 @@ function setFontSize(size, btn) {
 
 
 <!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE -----><!---- MATHS LOGIC STARTS HERE ----->
+
+
+
+
+
+
+
+
+
+<script>
+// CONTACT LENS → GLASSES CONVERSION
+function clToGlasses(F) {
+  const d = 0.010;
+  F = parseFloat(F);
+  if (isNaN(F)) return 0;
+  return F / (1 + d * F);
+}
+
+// UPDATE OUTPUT FROM PRE INPUTS
+function updateConvertedOutput() {
+  const mode = document.querySelector('input[name="pre-current-wearType"]:checked')?.value;
+  if (!mode) return;
+
+  ['od','os'].forEach(side => {
+    const preS = parseFloat(document.getElementById(`pre-s1_${side}`).value) || 0;
+    const preC = parseFloat(document.getElementById(`pre-c1_${side}`).value) || 0;
+    const preA = parseFloat(document.getElementById(`pre-a1_${side}`).value) || 0;
+
+    let outS, outC, outA;
+
+    if (mode === "glasses") {
+      outS = preS;
+      outC = preC;
+      outA = preA;
+    } else {
+      const total = preS + preC;
+      outS = clToGlasses(preS);
+      outC = clToGlasses(total) - outS;
+      outA = preA;
+    }
+
+    document.getElementById(`s1_${side}`).value = outS;
+    document.getElementById(`c1_${side}`).value = outC;
+    document.getElementById(`a1_${side}`).value = outA;
+
+    document.getElementById(`s1_${side}`).dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById(`c1_${side}`).dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById(`a1_${side}`).dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
+// ADD EVENT LISTENERS
+['pre-current-wear-glasses','pre-current-wear-contacts',
+ 'pre-s1_od','pre-c1_od','pre-a1_od',
+ 'pre-s1_os','pre-c1_os','pre-a1_os'
+].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("input", updateConvertedOutput);
+});
+</script>
+
+
+<script>
+// ==========================================
+// PRE-INPUT FORMATTING SCRIPT
+// ==========================================
+
+// Format sphere/cylinder to nearest 0.25 with + for positive
+function formatDiopterPre(val) {
+  if (val === '' || isNaN(val)) return '';
+  const n = parseFloat(val);
+  const snapped = Math.round(n * 4) / 4;       // snap to 0.25
+  return (snapped >= 0 ? '+' : '') + snapped.toFixed(2);
+}
+
+// Format axis to integer only
+function formatAxisPre(val) {
+  const n = parseFloat(val);
+  return isNaN(n) ? '' : Math.round(n);
+}
+
+// Apply formatting on blur only
+['pre-s1_od','pre-c1_od','pre-a1_od','pre-s1_os','pre-c1_os','pre-a1_os'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.addEventListener('blur', () => {
+    if (id.startsWith('pre-s1_') || id.startsWith('pre-c1_')) {
+      el.value = formatDiopterPre(el.value);
+    } else if (id.startsWith('pre-a1_')) {
+      el.value = formatAxisPre(el.value);
+    }
+  });
+});
+</script>
+
+
+<script>
+// ==========================================
+// OUTPUT FORMATTING SCRIPT
+// ==========================================
+
+// Format sphere/cylinder to nearest 0.25 with + for positive
+function formatDiopterOutput(val) {
+  if (val === '' || isNaN(val)) return '';
+  const n = parseFloat(val);
+  const snapped = Math.round(n * 4) / 4;       // snap to 0.25
+  return (snapped >= 0 ? '+' : '') + snapped.toFixed(2);
+}
+
+// Format axis to integer only
+function formatAxisOutput(val) {
+  const n = parseFloat(val);
+  return isNaN(n) ? '' : Math.round(n);
+}
+
+// Apply formatting to all output fields
+function formatAllOutputs() {
+  ['od','os'].forEach(side => {
+    const sEl = document.getElementById(`s1_${side}`);
+    const cEl = document.getElementById(`c1_${side}`);
+    const aEl = document.getElementById(`a1_${side}`);
+
+    if (sEl) sEl.value = formatDiopterOutput(sEl.value);
+    if (cEl) cEl.value = formatDiopterOutput(cEl.value);
+    if (aEl) aEl.value = formatAxisOutput(aEl.value);
+  });
+}
+
+// Format **on blur** so typing negatives is not blocked
+['s1_od','c1_od','a1_od','s1_os','c1_os','a1_os'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('blur', formatAllOutputs);
+});
+
+// Optional: format immediately after conversion updates
+['s1_od','c1_od','a1_od','s1_os','c1_os','a1_os'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    // only format sphere/cylinder live if desired, can skip axis
+    if (id.startsWith('s1_') || id.startsWith('c1_')) {
+      el.value = formatDiopterOutput(el.value);
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- script for AA calculator & change tolerance (keep this below the row) -->
@@ -1970,6 +2162,7 @@ function combineEyeWithout025(S_now, C_now, A_now, DC_S, C2, A2){
     const J452 = -rx2.C/2 * Math.sin(2 * deg2rad(rx2.A));
 
     let M_total = M1 + M2 + safeParseFloat(DC_S);
+
     let J0_total = J01 + J02;
     let J45_total = J451 + J452;
 
@@ -3367,10 +3560,6 @@ calculate();
 </script>
 
 
-
-
-
-
 <script>
 (function(){
   let sMinusApplied = false;
@@ -3408,16 +3597,6 @@ calculate();
 
 
 
-
-
-
-</div>
-
-
-
-
-
-
 <script>
 function goToAutoReport() {
   const data = {
@@ -3425,15 +3604,15 @@ function goToAutoReport() {
     name: document.getElementById("nameInput")?.value || "",
     age: document.getElementById("ageInput")?.value || "",
     currentWear: document.querySelector("input[name='current-wearType']:checked")?.value || "",
-    wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
+wearType: document.querySelector('input[name="pre-current-wearType"]:checked')?.value || "",
 
     /* CURRENT RX */
-    s1_od: document.getElementById("s1_od")?.value || "",
-    c1_od: document.getElementById("c1_od")?.value || "",
-    a1_od: document.getElementById("a1_od")?.value || "",
-    s1_os: document.getElementById("s1_os")?.value || "",
-    c1_os: document.getElementById("c1_os")?.value || "",
-    a1_os: document.getElementById("a1_os")?.value || "",
+    s1_od: document.getElementById("pre-s1_od")?.value || "",
+    c1_od: document.getElementById("pre-c1_od")?.value || "",
+    a1_od: document.getElementById("pre-a1_od")?.value || "",
+    s1_os: document.getElementById("pre-s1_os")?.value || "",
+    c1_os: document.getElementById("pre-c1_os")?.value || "",
+    a1_os: document.getElementById("pre-a1_os")?.value || "",
     nowSeDiff: document.getElementById("now-se-diff-od")?.textContent || "",
 
     /* ADD */
@@ -3515,7 +3694,7 @@ function goToAutoReport() {
   };
 
   localStorage.setItem("rxReport", JSON.stringify(data));
-  window.open("https://kiaraoptometrypx.github.io/RX_report/", "_blank");
+  window.open("report.html");
 }
 
 </script>
@@ -3530,12 +3709,12 @@ function goToReportManual() {
     wearType: document.querySelector('input[name="wearType"]:checked')?.value || "",
 
     /* CURRENT RX */
-    s1_od: document.getElementById("s1_od")?.value || "",
-    c1_od: document.getElementById("c1_od")?.value || "",
-    a1_od: document.getElementById("a1_od")?.value || "",
-    s1_os: document.getElementById("s1_os")?.value || "",
-    c1_os: document.getElementById("c1_os")?.value || "",
-    a1_os: document.getElementById("a1_os")?.value || "",
+    s1_od: document.getElementById("pre-s1_od")?.value || "",
+    c1_od: document.getElementById("pre-c1_od")?.value || "",
+    a1_od: document.getElementById("pre-a1_od")?.value || "",
+    s1_os: document.getElementById("pre-s1_os")?.value || "",
+    c1_os: document.getElementById("pre-c1_os")?.value || "",
+    a1_os: document.getElementById("pre-a1_os")?.value || "",
     nowSeDiff: document.getElementById("now-se-diff-od")?.textContent || "",
 
     /* ADD */
